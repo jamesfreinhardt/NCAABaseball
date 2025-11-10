@@ -1,0 +1,177 @@
+# --- 1. Load Libraries ---
+library(shiny)
+library(leaflet)
+library(dplyr)
+library(tidyr)       # For replace_na
+
+# ===================================================================
+# --- GLOBAL SECTION (Runs only ONCE when app starts) ---
+# ===================================================================
+
+# --- 2. Load Data ---
+merged_data2 <- read.csv("merged_data2.csv") # Load your full dataset
+
+# --- 3. Define Constants (Column Names) ---
+col_inst_name <- "inst_name"
+col_wins <- "wins"
+col_losses <- "losses"
+col_lat <- "latitude"
+col_long <- "longitude"
+col_division <- "Division"
+col_conference <- "Conference_Name"
+col_sat_mean <- "sat_crit_read_75_pctl"
+col_enrollment <- "est_fte"
+col_unitid <- "unitid"
+col_accept_rate <- "Acceptance_Rate"
+
+# --- 4. Define Color Palette ---
+div_palette <- colorFactor(
+  palette = c("blue", "purple", "darkblue"), # 1=blue, 2=red, 3=green
+  domain = c(1, 2, 3),
+  na.color = "grey"
+)
+
+# --- 5. Pre-process ALL Data ---
+# We do all the 'mutate' work here, one time.
+all_map_data <- merged_data2 %>%
+  mutate(
+    # --- Convert lat/long ---
+    LAT_num = as.numeric(.data[[col_lat]]),
+    LONG_num = as.numeric(.data[[col_long]]),
+    
+    # --- Create Win Pct ---
+    wins_num = as.numeric(replace_na(.data[[col_wins]], 0)),
+    losses_num = as.numeric(replace_na(.data[[col_losses]], 0)),
+    total_games = wins_num + losses_num,
+    win_pct = ifelse(total_games == 0, 0, wins_num / total_games),
+    win_pct = round(win_pct * 100),
+    
+    # --- Create Acceptance Rate ---
+    accept_rate_num = as.numeric(replace_na(.data[[col_accept_rate]], 0)),
+    accept_rate_pct = round(accept_rate_num * 100),
+    
+    # --- Create Marker Color ---
+    marker_color = div_palette(.data[[col_division]]),
+    
+    # --- Create Hover Label ---
+    hover_label = paste0(.data[[col_inst_name]], " (D", .data[[col_division]], ")"),
+    
+    # --- Create Popup Content (with Hyperlink) ---
+    popup_content = paste0(
+      "<strong><a href='https://collegescorecard.ed.gov/school?", .data[[col_unitid]],
+      "' target='_blank'>", .data[[col_inst_name]], "</a></strong>",
+      "<br/>",
+      "Record: ", .data[[col_wins]], "-", .data[[col_losses]], " (", win_pct, "%)",
+      "<br/>",
+      "Conference: ", .data[[col_conference]],
+      "<br/>",
+      "Acceptance Rate: ", accept_rate_pct, "%",
+      "<br/>",
+      "Total Enrollment: ", formatC(.data[[col_enrollment]], format = "d", big.mark = ",")
+    )
+    # --- STRAY PIPE REMOVED FROM HERE ---
+  ) %>%
+  # Filter out rows where location data is missing
+  filter(
+    !is.na(LAT_num) & !is.na(LONG_num)
+  )
+
+# ===================================================================
+# --- 6. Define the User Interface (UI) ---
+# ===================================================================
+ui <- fluidPage(
+  titlePanel("NCAA Baseball Map"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      checkboxGroupInput(
+        inputId = "division_filter",
+        label = "Division",
+        choices = c(1, 2, 3),
+        selected = c(1, 2, 3) # Start with all selected
+      ),
+      
+      sliderInput(
+        inputId = "win_pct_filter",
+        label = "Winning Pct (%)",
+        min = 0, max = 100,
+        value = c(0, 100) # Start with full range
+      ),
+      
+      sliderInput(
+        inputId = "accept_rate_filter",
+        label = "Acceptance Rate (%)",
+        min = 0, max = 100,
+        value = c(0, 100) # Start with full range
+      )
+    ),
+    
+    mainPanel(
+      leafletOutput("baseball_map", height = "80vh")
+    )
+  )
+)
+
+# ===================================================================
+# --- 7. Define the Server (The "Brain") ---
+# ===================================================================
+server <- function(input, output, session) {
+  
+  # --- This is the "brain" ---
+  # It's now very simple: it just filters the pre-processed data.
+  filtered_data <- reactive({
+    all_map_data %>%
+      filter(
+        .data[[col_division]] %in% input$division_filter &
+          win_pct >= input$win_pct_filter[1] &
+          win_pct <= input$win_pct_filter[2] &
+          accept_rate_pct >= input$accept_rate_filter[1] &
+          accept_rate_pct <= input$accept_rate_filter[2]
+      )
+  })
+  
+  # --- This creates the *initial* map (runs only once) ---
+  output$baseball_map <- renderLeaflet({
+    leaflet(data = all_map_data) %>% # Use all_map_data for initial bounds
+      addTiles() %>%
+      setView(lng = -98.5, lat = 39.8, zoom = 4) %>%
+      # Add the legend (it's static, so we only draw it once)
+      addLegend(
+        pal = div_palette,
+        values = ~get(col_division),
+        title = "Division",
+        position = "bottomright"
+      )
+  })
+  
+  # --- This *updates* the map (runs when filters change) ---
+  observe({
+    
+    # Get the filtered data from our "brain"
+    data_to_show <- filtered_data()
+    
+    leafletProxy("baseball_map", data = data_to_show) %>%
+      clearMarkers() %>%
+      clearMarkerClusters() %>% # Clear old markers
+      addCircleMarkers(
+        # --- FILLED IN THE ARGUMENTS ---
+        lng = ~LONG_num,
+        lat = ~LAT_num,
+        popup = ~popup_content,
+        label = ~hover_label,
+        radius = 6,
+        weight = 1,
+        opacity = 1,
+        fillOpacity = 0.7,
+        color = ~marker_color,
+        fillColor = ~marker_color,
+        # We can now use clustering again!
+        clusterOptions = markerClusterOptions(disableClusteringAtZoom = 8 ) 
+      )
+  })
+}
+
+# ===================================================================
+# --- 8. Run the App ---
+# ===================================================================
+shinyApp(ui = ui, server = server)
