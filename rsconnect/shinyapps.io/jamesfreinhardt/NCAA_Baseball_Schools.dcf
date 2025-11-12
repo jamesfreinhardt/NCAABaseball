@@ -1,0 +1,13 @@
+name: NCAA_Baseball_Schools
+title: NCAA_Baseball_Schools
+username: jamesfreinhardt
+account: jamesfreinhardt
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16032623
+bundleId: 11165260
+url: https://jamesfreinhardt.shinyapps.io/NCAA_Baseball_Schools/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: aoldpp.R|merged_data2.csv
