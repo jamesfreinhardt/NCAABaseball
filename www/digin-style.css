@@ -28,10 +28,16 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .page-title {
 
 /* --- Layout --- */
 
+
+
 /* Style the sidebar with the dark blue */
 .bslib-sidebar-layout > .sidebar {
   background-color: var(--digin-blue);
   color: #ffffff; /* Make all default text white */
+}
+
+.sidebar-content .conference_filter {
+  word-wrap: break-word; /* Allows long words to break and wrap */
 }
 
 /* Sidebar headings and text */

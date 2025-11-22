@@ -1,0 +1,125 @@
+/* --- Import Google Fonts --- */
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Oswald:400,700&display=swap'); /* For headings */
+
+/* --- Define Brand Colors --- */
+:root {
+  --pease-blue: #002147;
+  --pease-red: #C8102E;
+  --pease-yellow: #FFD700;
+  --pease-white: #FFFFFF;
+  --pease-gray: #F5F5F5;
+
+  /* Bootstrap overrides */
+  --bs-primary: var(--pease-red);
+  --bs-primary-rgb: 200, 16, 46;
+  --bs-link-color: var(--pease-red);
+  --bs-link-hover-color: #a60e24;
+}
+
+/* --- Fonts --- */
+body {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  color: var(--pease-yellow);
+  background-color: var(--pease-white);
+}
+
+/* Headings use Oswald and primary blue */
+h1, h2, h3, h4, h5, h6, .page-title {
+  font-family: 'Oswald', sans-serif;
+  color: var(--pease-blue);
+  font-weight: 700;
+}
+
+/* --- Navigation --- */
+.navbar {
+  background-color: var(--pease-blue);
+}
+.navbar .nav-link {
+  color: var(--pease-white);
+  font-family: 'Oswald', sans-serif;
+}
+.navbar .nav-link:hover {
+  color: var(--pease-yellow);
+}
+
+/* --- Buttons --- */
+.btn-primary {
+  background-color: var(--pease-red);
+  border-color: var(--pease-red);
+}
+.btn-primary:hover {
+  background-color: #a60e24;
+  border-color: #a60e24;
+}
+
+/* --- Sidebar --- */
+.bslib-sidebar-layout > .sidebar {
+  background-color: var(--pease-white);
+  color: var(--pease-white);
+}
+
+.sidebar h4, .sidebar .h4, .sidebar .control-label {
+  color: var(--pease-blue);
+  font-family: 'Oswald', sans-serif;
+}
+
+.sidebar .accordion-button {
+  background-color: var(--pease-red); /* Slightly lighter blue */
+  color: var(--pease-white);
+  font-family: 'Oswald', sans-serif;
+}
+
+.sidebar .accordion-button:not(.collapsed) {
+  background-color: var(--pease-yellow);
+  color: var(--pease-white);
+}
+
+.sidebar .accordion-body {
+  background-color: var(--pease-gray);
+}
+
+.sidebar .shiny-options-group label {
+  color: var(--pease-white);
+  font-family: 'Open Sans', sans-serif;
+}
+
+.sidebar .irs-grid-text {
+  color: #cccccc;
+}
+
+.sidebar .bootstrap-select .btn {
+  background-color: #003366;
+  color: var(--pease-white);
+  border-color: #003366;
+}
+
+/* --- Tabs --- */
+.nav-tabs .nav-link {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--pease-blue);
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+  color: var(--pease-red);
+  border-bottom: 3px solid var(--pease-yellow);
+}
+
+/* --- Cards --- */
+.card {
+  background-color: var(--pease-gray);
+  border: 1px solid #ddd;
+  border-top: 5px solid var(--pease-blue);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* --- Links --- */
+a {
+  color: var(--pease-red);
+}
+a:hover {
+  color: var(--pease-yellow);
+}
