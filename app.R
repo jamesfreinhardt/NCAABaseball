@@ -21,6 +21,9 @@ library(scales)      # For scales::percent in new plot
 merged_data2 <- read.csv("input.csv") 
 historical_data_raw <- read.csv("combined_ncaa_records.csv")
 
+# --- NEW: Load Updated Team History ---
+team_history_updated <- read.csv("ncaa_team_history_updated.csv")
+
 # --- NEW: Load Roster History ---
 roster_history_raw <- read.csv("combined_ncaa_rosters.csv") %>%
   # Ensure consistent naming for joins/filtering
@@ -831,13 +834,27 @@ server <- function(input, output, session) {
       # Define new IDs
       recruiting_plot_id <- paste0("recruiting_plot_", school_data$unitid)
       retention_plot_id <- paste0("retention_plot_", school_data$unitid)
-      
-      div(
+      # Find matching coach info for this school
+       coach_info <- team_history_updated %>%
+        filter(prev_team_id == school_data$prev_team_id, Year == "2025-26") %>%
+        slice(1)  # Take first match if multiple
+     
+        div(
         class = "roster-card",
         h4(school_data$inst_name),
         h5(paste0("Record: ", school_data$wins, "-", school_data$losses, " (", school_data$win_pct, "%)")),
         p(strong("Nickname:"), school_data$Nickname),
         p(strong("Conference:"), school_data$Conference_Name),
+        
+        
+
+        
+        # Add coach details to the card
+        p(strong("Head Coach:"), 
+          tags$a(href = coach_info$Coach_Stats_URL, coach_info$Head_Coach, target = "_blank")),
+        p(strong("Seasons at School:"), coach_info$Seasons_At_School),
+        
+        
         hr(),
         
         # --- ROW 1: Current Snapshot (Existing) ---
