@@ -5,9 +5,9 @@ account: jamesfreinhardt
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16032623
-bundleId: 11215201
+bundleId: 11238851
 url: https://jamesfreinhardt.shinyapps.io/NCAA_Baseball_Schools/
 version: 1
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: inputfileForBaseballMap.csv|inputold.csv|Ipeds_ncaa_id_join.csv|m1.csv|merged_data2.csv|merged_data5|merged_data5.csv|ncaa_all_rosters_2022.csv|ncaa_all_rosters_2023.csv|ncaa_all_rosters_2024.csv|ncaa_records_2022.csv|ncaa_records_2023.csv|ncaa_records_2024.csv|ncaa_records_2025.csv|OLDinput.csv|team_list.csv
+ignoredFiles: Ipeds_ncaa_id_join.csv|merged_data2.csv

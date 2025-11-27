@@ -22,7 +22,7 @@ merged_data2 <- read.csv("input.csv")
 historical_data_raw <- read.csv("combined_ncaa_records.csv")
 
 # --- NEW: Load Updated Team History ---
-team_history_updated <- read.csv("ncaa_team_history_updated.csv")
+team_history_updated <- read.csv("ncaa_team_history_updated2026.csv")
 
 # --- NEW: Load Roster History ---
 roster_history_raw <- read.csv("combined_ncaa_rosters.csv") %>%
@@ -31,9 +31,10 @@ roster_history_raw <- read.csv("combined_ncaa_rosters.csv") %>%
     prev_team_id = as.numeric(prev_team_id),
     year = as.numeric(year),
     class = trimws(class) # Remove whitespace just in case
-  )# --- NEW: Load Historical Data ---
+  )# --- NEW: Load US NEWS Data ---
+usnews_df<- read.csv("USNews2026.csv")
 
-
+merged_data2 <- merged_data2 %>% left_join(usnews_df , by = "unitid")
 
 # --- 3. Define Constants (Column Names) ---
 col_inst_name <- "inst_name"
@@ -70,6 +71,8 @@ col_state2_count <- "top_state_2_count"
 col_state3_count <- "top_state_3_count"
 col_locale <- "locale"
 col_udgs <- "ugds"
+col_usnews <- "Type"
+col_us_rank <- "US_Rank"
 col_prev_team_id <- "prev_team_id"
 # --- NEW: Define team_id column (assuming it's in input.csv) ---
 # --- REMOVED: col_team_id definition ---
@@ -96,6 +99,7 @@ inches_to_ft_in <- function(total_inches) {
 
 all_map_data <- merged_data2 %>%
   mutate(
+    #Type = .data[[col_usnews]],
     # --- Convert lat/long ---
     LAT_num = as.numeric(.data[[col_lat]]),
     LONG_num = as.numeric(.data[[col_long]]),
@@ -250,6 +254,7 @@ max_net_price <- round(max(net_price_for_range$net_price_avg, na.rm = TRUE),-2)
 
 # --- Get Unique Locale Choices for Filter ---
 locale_choices <- sort(unique(all_map_data$locale_label))
+#Type_choices <- sort(unique(all_map_data$Type))
 
 # --- MODIFIED: Get Unique UDGS Choices for Filter ---
 udgs_choices <- c(
@@ -405,7 +410,12 @@ ui <- bslib::page_sidebar(
       bslib::accordion_panel(
         title = "Academic & Financial",
         icon = icon("book-reader"),
-        sliderInput(
+        checkboxInput(
+          inputId = "usnews_ranked_only",
+          label = "US News-ranked schools",
+          value = FALSE
+        ),
+         sliderInput(
           inputId = "accept_rate_filter",
           label = "Acceptance Rate (%)",
           min = 0, max = 100,
@@ -606,6 +616,9 @@ server <- function(input, output, session) {
           
           # --- MODIFIED: UDGS Filter ---
           udgs_label %in% labels_to_include &
+
+          # --- NEW: US News ranking filter (only include rows where US_Rank is non-missing when checkbox is TRUE)
+          (!isTRUE(input$usnews_ranked_only) | (!is.na(.data[[col_us_rank]]) & .data[[col_us_rank]] != "")) &
           
           win_pct >= input$win_pct_filter[1] &
           win_pct <= input$win_pct_filter[2] &
@@ -787,7 +800,7 @@ server <- function(input, output, session) {
         "Distance (mi)" = distance_miles,
         "Win %" = win_pct,
         "Accept %" = accept_rate_pct,
-        "Size Category" = udgs_label, # --- MODIFIED ---
+        "Size" = all_of(col_udgs), # --- MODIFIED ---
         "SAT" = sat_score,
         "Tuition (In)" = tuition_in,
         "Tuition (Out)" = tuition_out,
@@ -841,20 +854,28 @@ server <- function(input, output, session) {
      
         div(
         class = "roster-card",
-        h4(school_data$inst_name),
-        h5(paste0("Record: ", school_data$wins, "-", school_data$losses, " (", school_data$win_pct, "%)")),
-        p(strong("Nickname:"), school_data$Nickname),
-        p(strong("Conference:"), school_data$Conference_Name),
-        
+        fluidRow(
+          column(3,
+                h4(school_data$inst_name),
+                h5(paste0("Record: ", school_data$wins, "-", school_data$losses, " (", school_data$win_pct, "%)")),
+                p(strong("Nickname:"), school_data$Nickname),
+                p(strong("Conference:"), school_data$Conference_Name)
+          ),
         
 
         
         # Add coach details to the card
-        p(strong("Head Coach:"), 
-          tags$a(href = coach_info$Coach_Stats_URL, coach_info$Head_Coach, target = "_blank")),
-        p(strong("Seasons at School:"), coach_info$Seasons_At_School),
-        
-        
+       column(6, h5(strong("Head Coach:"), 
+              tags$a(href = coach_info$Coach_Stats_URL, coach_info$Head_Coach, target = "_blank")),
+              h5(paste0("Coaches Record: ", coach_info$Total_Wins, "-", coach_info$Total_Losses, 
+                        " (", round(coach_info$Total_Wins/(coach_info$Total_Wins + coach_info$Total_Losses+coach_info$Total_Ties ),2)*100, "%)")),
+              p(strong(paste0("Seasons at ",school_data$inst_name,":")), coach_info$Seasons_At_Team),
+             ),
+       column(3, tags$img(src= paste0("https://web2.ncaa.org/ncaa_style/img/All_Logos/sm//",school_data$prev_team_id,".gif"), 
+                     height = "100px")
+             )
+              ),
+       
         hr(),
         
         # --- ROW 1: Current Snapshot (Existing) ---

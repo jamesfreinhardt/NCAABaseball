@@ -1,0 +1,571 @@
+College Name,State,US_Type,unitid,US_Rank
+Williams College,MA,COL,168342,1
+Amherst College,MA,COL,164465,2
+United States Naval Academy,MD,COL,164155,3
+Swarthmore College,PA,COL,216287,4
+Bowdoin College,ME,COL,161004,5
+United States Air Force Academy,CO,COL,128328,5
+Pomona College,CA,COL,121345,7
+Wellesley College,MA,COL,168218,7
+Claremont McKenna College,CA,COL,112260,7
+United States Military Academy,NY,COL,197036,10
+Carleton College,MN,COL,173258,10
+Harvey Mudd College,CA,COL,115409,10
+Vassar College,NY,COL,197133,13
+Barnard College,NY,COL,189097,13
+Wesleyan University,CT,COL,130697,13
+Davidson College,NC,COL,198385,13
+Hamilton College,NY,COL,191515,13
+Smith College,MA,COL,167835,13
+Grinnell College,IA,COL,153384,13
+Middlebury College,VT,COL,230959,13
+Washington and Lee University,VA,COL,234207,21
+Colgate University,NY,COL,190099,22
+University of Richmond,VA,COL,233374,22
+Haverford College,PA,COL,212911,24
+Colby College,ME,COL,161086,24
+Bates College,ME,COL,160977,24
+College of the Holy Cross,MA,COL,166124,27
+Macalester College,MN,COL,173902,28
+Mount Holyoke College,MA,COL,166939,29
+Colorado College,CO,COL,126678,30
+Bryn Mawr College,PA,COL,211273,30
+Bucknell University,PA,COL,211291,30
+Lafayette College,PA,COL,213385,30
+Denison University,OH,COL,202523,34
+Franklin and Marshall College,PA,COL,212577,35
+Occidental College,CA,COL,120254,35
+Skidmore College,NY,COL,195526,37
+Pitzer College,CA,COL,121257,37
+Trinity College,CT,COL,130590,37
+Spelman College,GA,COL,141060,37
+Trinity University,TX,COL,229267,37
+Scripps College,CA,COL,123165,37
+Soka University of America,CA,COL,399911,37
+Union College,NY,COL,196866,44
+Berea College,KY,COL,156295,45
+Kenyon College,OH,COL,203535,45
+Dickinson College,PA,COL,212009,45
+Furman University,SC,COL,218070,45
+Sewanee: The University of the South,TN,COL,221519,45
+Hillsdale College,MI,COL,170286,50
+St. Olaf College,MN,COL,174844,50
+Wheaton College,IL,COL,149781,50
+Connecticut College,CT,COL,128902,50
+Wabash College,IN,COL,152673,50
+Centre College,KY,COL,156408,55
+Rhodes College,TN,COL,221351,55
+Thomas Aquinas College,CA,COL,124292,55
+DePauw University,IN,COL,150400,58
+Whitman College,WA,COL,237057,58
+Oberlin College and Conservatory,OH,COL,204501,58
+Gettysburg College,PA,COL,212674,58
+St. Lawrence University,NY,COL,195216,58
+Reed College,OR,COL,209922,63
+Principia College,IL,COL,148016,63
+Virginia Military Institute,VA,COL,234085,65
+Lawrence University,WI,COL,239017,65
+Agnes Scott College,GA,COL,138600,67
+Wofford College,SC,COL,218973,67
+Kalamazoo College,MI,COL,170532,67
+Gustavus Adolphus College,MN,COL,173647,70
+Bard College,NY,COL,189088,70
+Muhlenberg College,PA,COL,214175,70
+College of St. Benedict,MN,COL,174747,73
+Hobart and William Smith Colleges,NY,COL,191630,73
+Lake Forest College,IL,COL,146481,75
+Wheaton College,MA,COL,168281,76
+Earlham College,IN,COL,150455,76
+College of Wooster,OH,COL,206589,76
+Willamette University,OR,COL,210401,76
+Allegheny College,PA,COL,210669,76
+Knox College,IL,COL,146427,76
+St. John's University,MN,COL,174792,82
+Stonehill College,MA,COL,167996,82
+Saint Mary's College,IN,COL,152390,84
+St. John's College,MD,COL,163976,84
+Ursinus College,PA,COL,216524,84
+Southwestern University,TX,COL,228343,84
+Austin College,TX,COL,222983,84
+Drew University,NJ,COL,184348,84
+Washington and Jefferson College,PA,COL,216667,84
+Hope College,MI,COL,170301,84
+Juniata College,PA,COL,213251,92
+Beloit College,WI,COL,238333,92
+Washington College,MD,COL,164216,92
+Whittier College,CA,COL,125763,92
+Saint Anselm College,NH,COL,183239,96
+University of Puget Sound,WA,COL,236328,96
+Morehouse College,GA,COL,140553,96
+St. Mary's College of Maryland,MD,COL,163912,96
+Augustana College,IL,COL,143084,96
+Lycoming College,PA,COL,213668,96
+Lewis & Clark College,OR,COL,209056,96
+Randolph-Macon College,VA,COL,233295,96
+Susquehanna University,PA,COL,216278,96
+St. John's College,NM,COL,245652,96
+Hendrix College,AR,COL,107080,96
+Hampden-Sydney College,VA,COL,232256,107
+Patrick Henry College,VA,COL,451927,107
+Sarah Lawrence College,NY,COL,195304,109
+Transylvania University,KY,COL,157818,109
+St. Norbert College,WI,COL,239716,111
+Linfield College,OR,COL,209065,111
+Luther College,IA,COL,153834,111
+Illinois College,IL,COL,145691,111
+Hanover College,IN,COL,150756,115
+Westmont College,CA,COL,125727,115
+Massachusetts College of Liberal Arts,MA,COL,167288,115
+Saint Michael's College,VT,COL,231059,115
+University of Minnesota Morris,MN,COL,174251,115
+Meredith College,NC,COL,198950,115
+Westminster College,PA,COL,216807,121
+Bennington College,VT,COL,230816,121
+Saint Vincent College,PA,COL,215798,121
+Ohio Wesleyan University,OH,COL,204909,121
+Cornell College,IA,COL,153162,121
+Covenant College,GA,COL,139393,126
+Roanoke College,VA,COL,233426,126
+Goucher College,MD,COL,162654,126
+Coe College,IA,COL,153144,126
+College of the Atlantic,ME,COL,160959,126
+Albion College,MI,COL,168546,131
+Central College,IA,COL,153108,131
+University of Mary Washington,VA,COL,232681,131
+State University of New York at Purchase College,NY,COL,196219,131
+New College of Florida,FL,COL,262129,135
+Eckerd College,FL,COL,133492,135
+Concordia College at Moorhead,MN,COL,173300,135
+University of North Carolina at Asheville,NC,COL,199111,135
+Hollins University,VA,COL,232308,135
+Emmanuel College,MA,COL,165671,135
+University of New Hampshire at Manchester,NH,COL,183071,135
+Claflin University,SC,COL,217873,135
+Salem College,NC,COL,199607,143
+Centenary College of Louisiana,LA,COL,158477,143
+Ripon College,WI,COL,239628,143
+Millsaps College,MS,COL,175980,146
+Franklin College,IN,COL,150604,146
+Aquinas College,MI,COL,168786,146
+Houghton College,NY,COL,191676,146
+New Saint Andrews College,ID,COL,440396,146
+Hartwick College,NY,COL,191533,151
+Ouachita Baptist University,AR,COL,107512,151
+University of Puerto Rico in Cayey,PR,COL,243151,151
+Monmouth College,IL,COL,147341,154
+Bethany Lutheran College,MN,COL,173142,154
+Hampshire College,MA,COL,166018,156
+Dillard University,LA,COL,158802,156
+Oglethorpe University,GA,COL,140696,156
+Fisk University,TN,COL,220181,156
+Wartburg College,IA,COL,154527,156
+Gordon College,MA,COL,165936,156
+Randolph College,VA,COL,233301,156
+Presbyterian College,SC,COL,218539,163
+Wittenberg University,OH,COL,206525,164
+Westminster College,MO,COL,179946,164
+Sweet Briar College,VA,COL,233718,164
+Bridgewater College,VA,COL,231581,167
+Lyon College,AR,COL,106342,167
+University of Virginia's College at Wise,VA,COL,233897,167
+Albright College,PA,COL,210571,170
+Maryville College,TN,COL,220710,170
+Guilford College,NC,COL,198613,172
+Johnson C. Smith University,NC,COL,198756,173
+Simpson University,CA,COL,123457,173
+Ava Maria University,FL,COL,442295,175
+Medgar Evers College-CUNY,NY,COL,190646,176
+Providence Christian College,CA,COL,455770,176
+Virginia Wesleyan University,VA,COL,234173,178
+Marymount Manhattan College,NY,COL,192864,178
+Georgetown College,KY,COL,156745,180
+Bryn Athyn College of the New Church,PA,COL,210492,180
+Tougaloo College,MS,COL,176406,180
+Antioch College,OH,COL,245892,T2 (183-201)
+Oakwood University,AL,COL,101912,T2 (183-201)
+Bethune-Cookman University,FL,COL,132602,T2 (183-201)
+"Holy Cross College at Notre Dame, Indiana",IN,COL,150774,T2 (183-201)
+Southern Virginia University,VA,COL,233611,T2 (183-201)
+Bennett College,NC,COL,197993,T2 (183-201)
+Allen University,SC,COL,217624,T2 (183-201)
+Bethany College,WV,COL,237181,T2 (183-201)
+Cheyney University of Pennsylvania,PA,COL,211608,T2 (183-201)
+East-West University,IL,COL,144883,T2 (183-201)
+Hebrew Theological College,IL,COL,145497,T2 (183-201)
+Lane College,TN,COL,220598,T2 (183-201)
+Rust College,MS,COL,176318,T2 (183-201)
+University of Pittsburgh at Greensburg,PA,COL,215275,T2 (183-201)
+University of Science and Arts of Oklahoma,OK,COL,207722,T2 (183-201)
+Virginia Union University,VA,COL,234164,T2 (183-201)
+Warren Wilson College,NC,COL,199865,T2 (183-201)
+Young Harris College,GA,COL,141361,T2 (183-201)
+Pennsylvania State University at Brandywine,PA,COL,214731,T2 (183-201)
+The King's College,NY,COL,454184,
+Simpson College,IA,COL,154350,
+Paine College,GA,COL,140720,
+Pillar College,NJ,COL,440794,
+Birmingham-Southern College,AL,COL,100937,
+Wells College,NY,COL,197230,
+Martin University,IN,COL,151810,
+Adrian College,MI,COL,168528,
+Albert Magnus College,CT,COL,128498,
+Albertson College,ID,COL,142294,
+Alfred University,NY,COL,188641,
+Alice Lloyd College,KY,COL,156189,
+Alma College,MI,COL,168591,
+American Jewish University,CA,COL,116846,
+Amridge University,AL,COL,100690,
+Arkansas Baptist College,AR,COL,106306,
+Asbury University,KY,COL,156213,
+Atlantic Union College,MA,COL,164571,
+Baker University,KS,COL,154688,
+Barat College,IL,COL,143163,
+Barber Scotia College,NC,COL,197948,
+Bard College at Simon's Rock,MA,COL,167792,
+Bay Path University,MA,COL,164632,
+Benedictine College,KS,COL,154712,
+Berry College,GA,COL,139144,
+Bethel College,KS,COL,154749,
+Bethel University,TN,COL,219718,
+Blackburn College,IL,COL,143288,
+Bloomfield College,NJ,COL,183822,
+Borromeo College of Ohio,OH,COL,203368,
+Brevard College,NC,COL,198066,
+Brewton-Parker College,GA,COL,139205,
+Brigham Young University-Hawaii,HI,COL,230047,
+Burlington College,VT,COL,230825,
+"California State University, Monterey Bay",CA,COL,409698,
+Calvin College,MI,COL,169080,
+Carroll College,MT,COL,180106,
+Carroll University,WI,COL,238458,
+Carson-Newman College,TN,COL,219806,
+Carthage College,WI,COL,238476,
+Castleton State College,VT,COL,230834,
+Cedar Crest College,PA,COL,211468,
+Chatham College,PA,COL,211556,
+Chestnut Hill College,PA,COL,211583,
+Chowan University,NC,COL,198303,
+Christendom College,VA,COL,231703,
+Christian Heritage College,CA,COL,112084,
+Christopher Newport University,VA,COL,231712,
+Clarke University,IA,COL,153126,
+Clearwater Christian College,FL,COL,133085,
+Coastal Carolina University,SC,COL,218724,
+College of Idaho,ID,COL,142294,
+College of Mount St. Vincent,NY,COL,193399,
+The College of Saints John Fisher and Thomas More,TX,COL,420352,
+Colorado State University Pueblo,CO,COL,128106,
+Concordia College,NY,COL,190248,
+Davis and Elkins College,WV,COL,237258,
+Doane University,NE,COL,181020,
+Eastern Mennonite University,VA,COL,232043,
+Eastern Nazarene College,MA,COL,165644,
+Elizabethtown College,PA,COL,212197,
+Elmira College,NY,COL,190983,
+Emory and Henry College,VA,COL,232025,
+Erskine College,SC,COL,217998,
+Evangel University,MO,COL,177339,
+Evergreen State College,WA,COL,235167,
+Ferrum College,VA,COL,232089,
+Fort Lewis College,CO,COL,127185,
+Franklin Pierce University,NH,COL,182795,
+Goddard College,VT,COL,230889,
+Goshen College,IN,COL,150668,
+Green Mountain College,VT,COL,230898,
+Greensboro College,NC,COL,198598,
+Grove City College,PA,COL,212805,
+Hamline University,MN,COL,173665,
+Harrisburg University of Science and Technology,PA,COL,446640,
+Hastings College,NE,COL,181127,
+Heidelberg University,OH,COL,203085,
+Hiram College,OH,COL,203128,
+Huntingdon College,AL,COL,101435,
+Huston-Tillotson University,TX,COL,225575,
+Illinois Wesleyan University,IL,COL,145646,
+Jarvis Christian College,TX,COL,225885,
+Judson College,AL,COL,101541,
+Kentucky State University,KY,COL,157058,
+Kentucky Wesleyan College,KY,COL,157076,
+King College,TN,COL,220516,
+LaGrange College,GA,COL,140234,
+Lambuth University,TN,COL,220589,
+Lebanon Valley College,PA,COL,213507,
+Lees-McRae College,NC,COL,198808,
+Life University,GA,COL,140252,
+Lindsey Wilson College,KY,COL,157216,
+Southampton College of Long Island University,NY,COL,192466,
+Louisiana State University of Alexandria,LA,COL,159382,
+MacMurray College,IL,COL,146825,
+Manhattanville College,NY,COL,192749,
+Mansfield University of Pennsylvania,PA,COL,213783,
+Marlboro College,VT,COL,230940,
+Marymount California University,CA,COL,118541,
+McDaniel College,MD,COL,164270,
+McPherson College,KS,COL,155511,
+Merrimack College,MA,COL,166850,
+Colorado Mesa University,CO,COL,127556,
+Metropolitan State College of Denver,CO,COL,127565,
+Millikin University,IL,COL,147244,
+Mills College,CA,COL,118888,
+Moravian University,PA,COL,214157,
+Muskingum College,OH,COL,204264,
+National Hispanic University,CA,COL,119544,
+Nebraska Wesleyan University,NE,COL,181446,
+Neumann College,PA,COL,214272,
+North Greenville University,SC,COL,218441,
+Northland College,WI,COL,239512,
+Olivet College,MI,COL,171599,
+Pacific Union College,CA,COL,120865,
+Philander Smith College,AR,COL,107600,
+Pine Manor College,MA,COL,167455,
+Providence College,RI,COL,217402,
+Regis College,MA,COL,167598,
+Richard Stockton College of New Jersey,NJ,COL,186876,
+Rockford College,IL,COL,148405,
+Rosemont College,PA,COL,215691,
+Russell Sage College,NY,COL,195128,
+San Diego Christian College,CA,COL,112084,
+Savannah State University,GA,COL,140960,
+Schreiner University,TX,COL,228042,
+Seton Hill University,PA,COL,215947,
+Shawnee State University,OH,COL,205443,
+Shepherd University,WV,COL,237792,
+Shimer College,IL,COL,148849,
+Shorter University,GA,COL,140988,
+Siena College,NY,COL,195474,
+Sierra Nevada College,NV,COL,182458,
+Spring Hill College,AL,COL,102234,
+St. Andrews Presbyterian College,NC,COL,199698,
+St. Augustine's College,NC,COL,199582,
+St. Francis College,NY,COL,195173,
+St. Vincent College,PA,COL,215798,
+State University of New York at Old Westbury,NY,COL,196237,
+Stephens College,MO,COL,179548,
+Sterling College,VT,COL,231095,
+Sterling College,KS,COL,155937,
+Stillman College,AL,COL,102270,
+Talladega College,AL,COL,102298,
+Texas A&M University at Galveston,TX,COL,228714,
+Texas Lutheran University,TX,COL,228981,
+Thiel College,PA,COL,216357,
+Thomas More College of Liberal Arts,NH,COL,183275,
+Thomas More University,KY,COL,157809,
+University of Arizona Global Campus,IA,COL,154022,
+University of Dallas,TX,COL,224323,
+University of Hawaii at Hilo,HI,COL,141565,
+University of Hawaii at West Oahu,HI,COL,141981,
+University of Judaism,CA,COL,116846,
+University of Main at Presque Isle,ME,COL,161341,
+University of Maine at Machias,ME,COL,161244,
+University of Mount Union,OH,COL,204185,
+University of Pikeville,KY,COL,157535,
+University of Pittsburgh at Bradford,PA,COL,215266,
+University of Puerto Rico in Ponce,PR,COL,243212,
+University of South Carolina Beaufort,SC,COL,218654,
+University of the West,CA,COL,449870,
+University of Wisconsin-Green Bay,WI,COL,240277,
+University of Wisconsin-Parkside,WI,COL,240374,
+University of Wisconsin-Superior,WI,COL,240426,
+Virginia Intermont College,VA,COL,233912,
+Warner Pacific College,OR,COL,210304,
+Wesleyan College,GA,COL,141325,
+West Virginia State University,WV,COL,237899,
+West Virginia Wesleyan College,WV,COL,237969,
+Western Colorado University,CO,COL,128391,
+William Jewell College,MO,COL,179955,
+William Peace University,NC,COL,199272,
+Williams Baptist University,AR,COL,107877,
+Wingate University,NC,COL,199962,
+Wisconsin Lutheran College,WI,COL,240338,
+Xavier University of Louisiana,LA,COL,160904,
+Princeton University,NJ,UNIV,186131,1
+Massachusetts Institute of Technology,MA,UNIV,166683,2
+Harvard University,MA,UNIV,166027,3
+Stanford University,CA,UNIV,243744,4
+Yale University,CT,UNIV,130794,4
+University of Chicago,IL,UNIV,144050,6
+Duke University,NC,UNIV,198419,7
+Johns Hopkins University,MD,UNIV,162928,7
+Northwestern University,IL,UNIV,147767,7
+University of Pennsylvania,PA,UNIV,215062,7
+California Institute of Technology,CA,UNIV,110404,11
+Cornell University,NY,UNIV,190415,12
+Brown University,RI,UNIV,217156,13
+Dartmouth College,NH,UNIV,182670,13
+Columbia University,NY,UNIV,190150,15
+University of California-Berkeley,CA,UNIV,110635,15
+University of California-Los Angeles,CA,UNIV,110662,17
+Rice University,TX,UNIV,227757,17
+Vanderbilt University,TN,UNIV,221999,17
+University of Notre Dame,IN,UNIV,152080,20
+Carnegie Mellon University,PA,UNIV,211440,20
+University of Michigan-Ann Arbor,MI,UNIV,170976,20
+Washington University in St. Louis,MO,UNIV,179867,20
+Emory University,GA,UNIV,139658,24
+Georgetown University,DC,UNIV,131496,24
+University of Virginia,VA,UNIV,234076,26
+University of North Carolina-Chapel Hill,NC,UNIV,199120,26
+University of Southern California,CA,UNIV,123961,28
+University of California-San Diego,CA,UNIV,110680,29
+University of Florida,FL,UNIV,134130,30
+University of Texas-Austin,TX,UNIV,228778,30
+New York University,NY,UNIV,193900,32
+Georgia Institute of Technology,GA,UNIV,139755,32
+University of California-Davis,CA,UNIV,110644,32
+University of California-Irvine,CA,UNIV,110653,32
+University of Illinois-Urbana-Champaign,IL,UNIV,145637,36
+Boston College,MA,UNIV,164924,36
+Tufts University,MA,UNIV,168148,36
+University of Wisconsin-Madison,WI,UNIV,240444,36
+University of California-Santa Barbara,CA,UNIV,110705,40
+Ohio State University-Columbus,OH,UNIV,204796,40
+Boston University,MA,UNIV,164988,42
+Rutgers University-New Brunswick,NJ,UNIV,186380,42
+University of Maryland-College Park,MD,UNIV,163286,42
+University of Washington,WA,UNIV,236948,42
+University of Rochester,NY,UNIV,195030,46
+Lehigh University,PA,UNIV,213543,46
+Purdue University,IN,UNIV,243780,46
+University of Georgia,GA,UNIV,139959,46
+Northeastern University,MA,UNIV,167358,46
+Wake Forest University,NC,UNIV,199847,51
+Case Western Reserve University,OH,UNIV,201645,51
+Texas A&M University-College Station,TX,UNIV,228723,51
+Virginia Polytechnic Institute and State University,VA,UNIV,233921,51
+College of William and Mary,VA,UNIV,231624,51
+Florida State University,FL,UNIV,134097,51
+University of California-Merced,CA,UNIV,445188,57
+Villanova University,PA,UNIV,216597,57
+University of Minnesota,MN,UNIV,174066,59
+Stony Brook University,NY,UNIV,196097,59
+George Washington University,DC,UNIV,131469,59
+Pennsylvania State University-University Park,PA,UNIV,214777,59
+Santa Clara University,CA,UNIV,122931,59
+North Carolina State University,NC,UNIV,199193,64
+University of Massachusetts-Amherst,MA,UNIV,166629,64
+Michigan State University,MI,UNIV,171100,64
+University of Miami,FL,UNIV,135726,64
+Rensselaer Polytechnic Institute,NY,UNIV,194824,64
+Brandeis University,MA,UNIV,165015,69
+Tulane University,LA,UNIV,160755,69
+University of Connecticut,CT,UNIV,129020,69
+University of Pittsburgh,PA,UNIV,215293,69
+Binghamton University,NY,UNIV,196079,73
+Indiana University-Bloomington,IN,UNIV,151351,73
+Syracuse University,NY,UNIV,196413,75
+University of Buffalo,NY,UNIV,196088,75
+University of California-Riverside,CA,UNIV,110671,75
+Clemson University,SC,UNIV,217882,75
+Rutgers University-Newark,NJ,UNIV,186399,75
+Colorado School of Mines,CO,UNIV,126775,80
+Stevens Institute of Technology,NJ,UNIV,186867,80
+New Jersey Institute of Technology,NJ,UNIV,185828,80
+Drexel University,PA,UNIV,212054,80
+Pepperdine University,CA,UNIV,121150,84
+University of Illinois-Chicago,IL,UNIV,145600,84
+Worcester Polytechnic Institute,MA,UNIV,168421,84
+Yeshiva University,NY,UNIV,197708,84
+University of California-Santa Cruz,CA,UNIV,110714,88
+Howard University,DC,UNIV,131520,88
+Marquette University,WI,UNIV,239105,88
+University of Delaware,DE,UNIV,130943,88
+American University,DC,UNIV,131159,88
+Baylor University,TX,UNIV,223232,88
+Rochester Institute of Technology,NY,UNIV,195003,88
+Southern Methodist University,TX,UNIV,228246,88
+University of South Florida,FL,UNIV,137351,88
+Fordham University,NY,UNIV,191241,97
+Florida International University,FL,UNIV,133951,97
+Rutgers University-Camden,NJ,UNIV,186371,97
+University of Colorado-Boulder,CO,UNIV,126614,97
+Texas Christian University,TX,UNIV,228875,97
+Loyola Marymount University,CA,UNIV,117946,102
+Gonzaga University,WA,UNIV,235316,102
+Temple University,PA,UNIV,216339,102
+University of Iowa,IA,UNIV,153658,102
+Auburn University,AL,UNIV,100858,102
+Saint Louis University,MZ,UNIV,179159,102
+University of Missouri-Columbia,MZ,UNIV,178396,102
+University of Tennessee-Knoxville,TN,UNIV,221759,102
+Brigham Young University,UT,UNIV,230038,110
+University of Oregon,OR,UNIV,209551,110
+University of San Diego,CA,UNIV,122436,110
+University of San Francisco,CA,UNIV,122612,110
+University of Texas-Dallas,TX,UNIV,228787,110
+Chapman University,CA,UNIV,111948,110
+University of Oklahoma,OK,UNIV,207500,110
+Illinois Institute of Technology,IL,UNIV,145725,117
+George Mason University,VA,UNIV,232186,117
+San Diego State University,CA,UNIV,122409,117
+University of New Hampshire,NH,UNIV,183044,117
+Arizona State University-Tempe,AZ,UNIV,104151,117
+Creighton University,NE,UNIV,181002,117
+Elon University,NC,UNIV,198516,117
+Iowa State University of Science and Technology,IA,UNIV,153603,117
+University of Central Florida,FL,UNIV,132903,117
+University of Denver,CO,UNIV,127060,117
+California State University-Long Beach,CA,UNIV,110565,127
+University of Arizona,AZ,UNIV,104179,127
+University at Albany,NY,UNIV,196060,127
+University of South Carolina,SC,UNIV,218663,127
+University of Maryland-Baltimore County,MD,UNIV,163268,127
+CUNY-City College,NY,UNIV,190567,132
+University of Vermont,VT,UNIV,231174,132
+California State University-Fullerton,CA,UNIV,110583,132
+Clark University,MA,UNIV,165334,132
+Loyola University Chicago,IL,UNIV,146719,132
+Thomas Jefferson University,PA,UNIV,216366,132
+University of Alabama-Birmingham,AL,UNIV,100663,132
+University of Houston,TX,UNIV,225511,132
+Fairfield University,CT,UNIV,129242,139
+University of the Pacific,CA,UNIV,120883,139
+Virginia Commonwealth University,VA,UNIV,234030,139
+Miami University-Oxford,OH,UNIV,204024,143
+University of Dayton,OH,UNIV,202480,143
+Oregon State University,OR,UNIV,209542,143
+Clarkson University,NY,UNIV,190044,143
+University of Kansas,KS,UNIV,155317,143
+University of Kentucky,KY,UNIV,157085,143
+University of North Carolina-Charlotte,NC,UNIV,199139,143
+Touro University,NY,UNIV,196592,143
+University of Utah,UT,UNIV,230764,
+SUNY College of Environmental Science and Forestry,NY,UNIV,196103,
+Colorado State University,CO,UNIV,126818,
+James Madison University,VA,UNIV,232423,
+Michigan Technological University,MI,UNIV,171128,
+University of St. Thomas,MN,UNIV,174914,
+Adelphi University,NY,UNIV,188429,
+Catholic University of America,DC,UNIV,131283,
+DePaul University,IL,UNIV,144740,
+Drake University,IA,UNIV,153269,
+Duquesne University,PA,UNIV,212106,
+Gallaudet University,DC,UNIV,131450,
+Hofstra University,NY,UNIV,191649,
+Illinois State University,IL,UNIV,145813,
+Kansas State University,KS,UNIV,155399,
+Louisiana State University-Baton Rouge,LA,UNIV,159391,
+Mercer University,GA,UNIV,140447,
+Mississippi State University,MS,UNIV,176080,
+Missouri University of Science & Technology,MZ,UNIV,178411,
+Ohio University,OH,UNIV,204857,
+Oklahoma State University,OK,UNIV,207388,
+Polytechnic Institute of New York University,NY,UNIV,194541,
+Quinnipiac University,CT,UNIV,130226,
+Samford University,AL,UNIV,102049,
+Seattle University,WA,UNIV,236595,
+Seton Hall University,NJ,UNIV,186584,
+Simmons University,MA,UNIV,167783,
+South Carolina State University,SC,UNIV,218733,
+St. John Fisher College,NY,UNIV,195720,
+St. John's University (NY),NY,UNIV,195809,
+The New School,NY,UNIV,193654,
+University of Alabama,AL,UNIV,100751,
+University of Arkansas,AR,UNIV,106397,
+University of Cincinnati,OH,UNIV,201885,
+University of La Verne,CA,UNIV,117140,
+University of Mississippi,MS,UNIV,176017,
+University of Nebraska-Lincoln,NE,UNIV,181464,
+University of Rhode Island,RI,UNIV,217484,
+University of St. Joseph,CT,UNIV,130314,
+University of Tulsa,OK,UNIV,207971,
+Washington State University,WA,UNIV,236939,
