@@ -36,6 +36,144 @@ usnews_df<- read.csv("USNews2026.csv")
 
 merged_data2 <- merged_data2 %>% left_join(usnews_df , by = "unitid")
 
+# --- NEW: Try to load climate quartile summaries (from clim pipeline)
+# Prefer full file; fall back to test-version.
+clim_files <- c("school_climatology_monthly_wide.csv",
+                "school_climatology_monthly_wide_first10.csv",
+                "school_climatology_monthly_wide_first100.csv")
+found_clim <- NULL
+for (f in clim_files) if (file.exists(f)) { found_clim <- f; break }
+
+if (!is.null(found_clim)) {
+  clim_wide <- read.csv(found_clim, stringsAsFactors = FALSE)
+  # clim_wide has rows for each unitid x variable. We'll pivot to one-row-per-unitid
+  clim_annual_quart <- clim_wide %>%
+    select(unitid, variable, annual_quartile, mean_value) %>%
+    pivot_wider(names_from = variable, values_from = c(annual_quartile, mean_value), names_sep = "__")
+
+  # Normalize names to prefixed columns
+  # Example names: annual_quartile__t2m, mean_value__t2m, etc.
+  clim_annual_quart <- clim_annual_quart %>%
+    rename_with(~ gsub("annual_quartile__", "quart_", .x), starts_with("annual_quartile__")) %>%
+    rename_with(~ gsub("mean_value__", "mean_", .x), starts_with("mean_value__"))
+
+  # Merge into main merged_data2 by unitid
+  # Also extract monthly values for each variable and merge into merged_data2
+  # Detect month column names (JAN..DEC) in the CSV (case-insensitive)
+  month_abb <- month.abb
+  month_cols <- names(clim_wide)[toupper(names(clim_wide)) %in% toupper(month_abb)]
+
+  # helper to map actual colnames to canonical lower-month abbreviations
+  month_map <- setNames(
+    vapply(month_abb, function(m) {
+      w <- names(clim_wide)[toupper(names(clim_wide)) == toupper(m)]
+      if (length(w) > 0) w[1] else NA_character_
+    }, character(1), USE.NAMES = FALSE),
+    tolower(month_abb)
+  )
+
+  # build per-variable monthly wide frames and merge
+  vars_expected <- c("t2m", "cloud_amt", "prectotcorr")
+  monthly_dfs <- list()
+  for (v in vars_expected) {
+    rows <- clim_wide %>% filter(tolower(variable) == tolower(v))
+    if (nrow(rows) > 0) {
+      # pick the active columns from month_map that exist
+      existing <- month_map[!is.na(month_map)]
+      if (length(existing) > 0) {
+        dfv <- rows %>% select(unitid, all_of(existing))
+        # rename month columns to var_monthname (e.g., t2m_jan)
+        new_names <- c("unitid", paste0(v, "_", names(existing)))
+        names(dfv) <- new_names
+        monthly_dfs[[v]] <- dfv
+      }
+    }
+  }
+
+  # merge monthly dfs together into one per-unitid wide table
+  if (length(monthly_dfs) > 0) {
+    clim_monthly <- Reduce(function(a,b) full_join(a,b, by = "unitid"), monthly_dfs)
+  } else {
+    clim_monthly <- tibble(unitid = character(0))
+  }
+
+  merged_data2 <- merged_data2 %>% left_join(clim_annual_quart, by = "unitid") %>%
+    left_join(clim_monthly, by = "unitid")
+} else {
+  message("No climatology wide CSV found (school_climatology_monthly_wide*.csv). Skipping climate join.")
+}
+
+# Make sure quartile and mean columns exist to avoid errors when CSV absent
+quart_cols <- c("quart_t2m", "quart_prectotcorr", "quart_cloud_amt")
+mean_cols <- c("mean_t2m", "mean_prectotcorr", "mean_cloud_amt")
+for (cname in quart_cols) if (!cname %in% names(merged_data2)) merged_data2[[cname]] <- NA_integer_
+for (cname in mean_cols) if (!cname %in% names(merged_data2)) merged_data2[[cname]] <- NA_real_
+
+  # Ensure monthly columns exist (t2m_jan..dec, cloud_amt_jan..dec, prectotcorr_jan..dec)
+for (v in c("t2m","cloud_amt","prectotcorr")) {
+  for (m in tolower(month.abb)) {
+    cname <- paste0(v, "_", m)
+    if (!cname %in% names(merged_data2)) merged_data2[[cname]] <- NA_real_
+  }
+}
+
+# --- Convert temperatures from Celsius to Fahrenheit (NASA POWER T2M is °C).
+# Coerce values to numeric first (handles characters), then convert; keep NA if coercion fails
+temp_cols <- grep("^t2m_", names(merged_data2), value = TRUE)
+if (length(temp_cols) > 0) {
+  # Element-wise safe conversion (handles list elements and character values)
+  merged_data2 <- merged_data2 %>% mutate(
+    across(all_of(temp_cols), ~ vapply(.x, function(x) {
+      # unwrap lists, take the first element if vector-like
+      val <- if (is.list(x)) {
+        x2 <- unlist(x)
+        if (length(x2) == 0) return(NA_real_)
+        x2[1]
+      } else {
+        # atomic scalar or vector -> take first element
+        if (length(x) == 0) return(NA_real_)
+        x[1]
+      }
+
+      num <- suppressWarnings(as.numeric(val))
+      if (is.na(num)) return(NA_real_)
+      return(num)
+    }, numeric(1)))
+  )
+}
+# Convert mean_t2m if present (coerce to numeric first)
+if ("mean_t2m" %in% names(merged_data2)) {
+  merged_data2 <- merged_data2 %>% mutate(
+    mean_t2m = vapply(mean_t2m, function(x) {
+      val <- if (is.list(x)) {
+        x2 <- unlist(x)
+        if (length(x2) == 0) return(NA_real_)
+        x2[1]
+      } else {
+        if (length(x) == 0) return(NA_real_)
+        x[1]
+      }
+      num <- suppressWarnings(as.numeric(val))
+      if (is.na(num)) return(NA_real_)
+      return(num)
+    }, numeric(1))
+  )
+}
+
+# Compute global min/max across months for UI defaults (used as initial slider ranges)
+t2m_all <- merged_data2 %>% select(starts_with("t2m_")) %>% unlist(use.names = FALSE)
+prec_all <- merged_data2 %>% select(starts_with("prectotcorr_")) %>% unlist(use.names = FALSE)
+cloud_all <- merged_data2 %>% select(starts_with("cloud_amt_")) %>% unlist(use.names = FALSE)
+
+global_t2m_min <- ifelse(all(is.na(t2m_all)), 0, min(t2m_all, na.rm = TRUE))
+global_t2m_max <- ifelse(all(is.na(t2m_all)), 100, max(t2m_all, na.rm = TRUE))
+
+global_prec_min <- ifelse(all(is.na(prec_all)), 0, min(prec_all, na.rm = TRUE))
+global_prec_max <- ifelse(all(is.na(prec_all)), 0, max(prec_all, na.rm = TRUE))
+
+global_cloud_min <- ifelse(all(is.na(cloud_all)), 0, min(cloud_all, na.rm = TRUE))
+global_cloud_max <- ifelse(all(is.na(cloud_all)), 100, max(cloud_all, na.rm = TRUE))
+
 # --- 3. Define Constants (Column Names) ---
 col_inst_name <- "inst_name"
 col_wins <- "wins"
@@ -339,6 +477,49 @@ ui <- bslib::page_sidebar(
             value = 2500, step = 50,
             sep =""
           )
+        ),
+
+        # --- NEW: Climate accordion (monthly filters) ---
+        bslib::accordion(
+          open = "Climate",
+          bslib::accordion_panel(
+            title = "Climate",
+            tagList(
+              selectInput(
+                inputId = "clim_month",
+                label = "Select month",
+                # Add an 'Annual' option plus months
+                choices = c("annual" = "annual", setNames(as.character(1:12), month.abb)),
+                selected = as.character(1)
+              ),
+              sliderInput(
+                inputId = "t2m_month_filter",
+                label = "Avg. Temp (selected month) (°F)",
+                min = round(global_t2m_min, 0),
+                max = round(global_t2m_max, 0),
+                value = c(round(global_t2m_min, 0), round(global_t2m_max, 0)),
+                step = 1
+              ),
+              sliderInput(
+                inputId = "prectot_month_filter",
+                label = "Avg. Precip (selected month) (mm/day)",
+                min = round(global_prec_min, 1),
+                max = round(global_prec_max, 1),
+                value = c(round(global_prec_min, 1), round(global_prec_max, 1)),
+                step = 0.1
+              ),
+              sliderInput(
+                inputId = "cloud_month_filter",
+                label = "Avg. Cloud (selected month) (%)",
+                min = round(global_cloud_min, 1),
+                max = round(global_cloud_max, 1),
+                value = c(round(global_cloud_min, 1), round(global_cloud_max, 1)),
+                step = 0.1
+              )
+              ,
+              helpText("Units: Temperature in °F, Precipitation in mm/day, Cloud in % (monthly climatological averages).")
+            )
+          )
         )
       ),
       
@@ -415,6 +596,7 @@ ui <- bslib::page_sidebar(
           label = "US News-ranked schools",
           value = FALSE
         ),
+        # (climate filters moved to Location panel)
          sliderInput(
           inputId = "accept_rate_filter",
           label = "Acceptance Rate (%)",
@@ -487,6 +669,50 @@ server <- function(input, output, session) {
 
   # --- ReactiveVal to store saved school IDs ---
   saved_school_ids <- reactiveVal(character(0))
+
+  # --- Update monthly slider ranges when selected month changes ---
+  observeEvent(input$clim_month, {
+    req(input$clim_month)
+    sel_val <- input$clim_month
+    if (is.null(sel_val)) sel_val <- "1"
+
+    if (sel_val == "annual") {
+      temp_col <- "mean_t2m"
+      prec_col <- "mean_prectotcorr"
+      cloud_col <- "mean_cloud_amt"
+      is_annual <- TRUE
+    } else {
+      sel_month <- as.integer(sel_val)
+      mkey <- tolower(month.abb[sel_month])
+      temp_col <- paste0("t2m_", mkey)
+      prec_col <- paste0("prectotcorr_", mkey)
+      cloud_col <- paste0("cloud_amt_", mkey)
+      is_annual <- FALSE
+    }
+
+    # Use values from all_map_data (global pre-processed frame) for slider ranges
+    if (temp_col %in% names(all_map_data)) {
+      vals <- all_map_data[[temp_col]]
+      minv <- ifelse(all(is.na(vals)), global_t2m_min, min(vals, na.rm = TRUE))
+      maxv <- ifelse(all(is.na(vals)), global_t2m_max, max(vals, na.rm = TRUE))
+      # round temps to whole numbers (°F); for annual, also use whole number steps
+      updateSliderInput(session, "t2m_month_filter", min = floor(minv), max = ceiling(maxv), value = c(floor(minv), ceiling(maxv)), step = 1)
+    }
+
+    if (prec_col %in% names(all_map_data)) {
+      vals <- all_map_data[[prec_col]]
+      minv <- ifelse(all(is.na(vals)), global_prec_min, min(vals, na.rm = TRUE))
+      maxv <- ifelse(all(is.na(vals)), global_prec_max, max(vals, na.rm = TRUE))
+      updateSliderInput(session, "prectot_month_filter", min = round(minv, 1), max = round(maxv, 1), value = c(round(minv, 1), round(maxv, 1)), step = 0.1)
+    }
+
+    if (cloud_col %in% names(all_map_data)) {
+      vals <- all_map_data[[cloud_col]]
+      minv <- ifelse(all(is.na(vals)), global_cloud_min, min(vals, na.rm = TRUE))
+      maxv <- ifelse(all(is.na(vals)), global_cloud_max, max(vals, na.rm = TRUE))
+      updateSliderInput(session, "cloud_month_filter", min = round(minv, 1), max = round(maxv, 1), value = c(round(minv, 1), round(maxv, 1)), step = 0.1)
+    }
+  })
  
   # --- NEW: Handle Map Clicks to Update Zip ---
  
@@ -605,6 +831,20 @@ server <- function(input, output, session) {
     # 2. Get all labels that fall within that range
     labels_to_include <- udgs_choices[selected_indices[1]:selected_indices[2]]
     
+    # Determine selected month and corresponding column names before filtering
+    sel_val <- ifelse(is.null(input$clim_month), "1", input$clim_month)
+    if (sel_val == "annual") {
+      temp_col <- "mean_t2m"
+      prec_col <- "mean_prectotcorr"
+      cloud_col <- "mean_cloud_amt"
+    } else {
+      sel_month <- as.integer(sel_val)
+      mkey <- tolower(month.abb[sel_month])
+      temp_col <- paste0("t2m_", mkey)
+      prec_col <- paste0("prectotcorr_", mkey)
+      cloud_col <- paste0("cloud_amt_", mkey)
+    }
+
     data_with_distance() %>%
       filter(
         # Standard filters
@@ -628,6 +868,23 @@ server <- function(input, output, session) {
           
           # Net Price Filter
           (net_price_avg == 0 | (net_price_avg >= input$net_price_filter[1] & net_price_avg <= input$net_price_filter[2])) &
+
+          # --- NEW: Climate monthly filters (by selected month) ---
+          (
+            is.null(input$t2m_month_filter) |
+            is.na(.data[[temp_col]]) |
+            (.data[[temp_col]] >= input$t2m_month_filter[1] & .data[[temp_col]] <= input$t2m_month_filter[2])
+          ) &
+          (
+            is.null(input$prectot_month_filter) |
+            is.na(.data[[prec_col]]) |
+            (.data[[prec_col]] >= input$prectot_month_filter[1] & .data[[prec_col]] <= input$prectot_month_filter[2])
+          ) &
+          (
+            is.null(input$cloud_month_filter) |
+            is.na(.data[[cloud_col]]) |
+            (.data[[cloud_col]] >= input$cloud_month_filter[1] & .data[[cloud_col]] <= input$cloud_month_filter[2])
+          ) &
           
           # Distance filter
           distance_miles <= input$distance_filter
@@ -716,6 +973,25 @@ server <- function(input, output, session) {
   
   # --- MODIFIED: Output for the filtered data table ---
   output$filtered_table <- renderDT({
+    sel_val <- ifelse(is.null(input$clim_month), "1", input$clim_month)
+    if (sel_val == "annual") {
+      temp_col_sel <- "mean_t2m"
+      prec_col_sel <- "mean_prectotcorr"
+      cloud_col_sel <- "mean_cloud_amt"
+      label_temp <- "Temp (annual) (°F)"
+      label_prec <- "Precip (annual) (mm/day)"
+      label_cloud <- "Cloud (annual) (%)"
+    } else {
+      sel_month_idx <- as.integer(sel_val)
+      sel_m <- tolower(month.abb[sel_month_idx])
+      temp_col_sel <- paste0("t2m_", sel_m)
+      prec_col_sel <- paste0("prectotcorr_", sel_m)
+      cloud_col_sel <- paste0("cloud_amt_", sel_m)
+      label_temp <- "Temp (selected month) (°F)"
+      label_prec <- "Precip (selected month) (mm/day)"
+      label_cloud <- "Cloud (selected month) (%)"
+    }
+
     data_to_show <- filtered_data() %>%
       select(
         "Name" = all_of(col_inst_name),
@@ -730,21 +1006,24 @@ server <- function(input, output, session) {
         "Tuition (In)" = tuition_in,
         "Tuition (Out)" = tuition_out,
         "Avg. Net Price" = net_price_avg,
-        "Net Price (110k+)" = net_price_110k
+        "Net Price (110k+)" = net_price_110k,
+        # Climate columns intentionally removed per user preference
       ) %>%
       mutate(
         `Distance (mi)` = round(`Distance (mi)`, 1)
       )
     
+
     datatable(
       data_to_show, 
       selection = 'multiple', 
       options = list(pageLength = 100, scrollX = TRUE) 
     ) %>%
       formatCurrency(
-        c("Tuition (In)", "Tuition (Out)", "Avg. Net Price", "Net Price (110k+)"), 
+        c("Tuition (In)", "Tuition (Out)", "Avg. Net Price", "Net Price (110k+)") ,
         digits = 0
       )
+      # climate columns removed — no additional rounding needed here
   })
   
   
@@ -763,7 +1042,7 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$remove_from_saved, {
+  observeEvent(input$remove_from_saved, { 
     selected_rows <- input$saved_table_rows_selected
     
     if (!is.null(selected_rows)) {
@@ -791,6 +1070,25 @@ server <- function(input, output, session) {
   
   # --- MODIFIED: Output the saved table ---
   output$saved_table <- renderDT({
+    sel_val <- ifelse(is.null(input$clim_month), "1", input$clim_month)
+    if (sel_val == "annual") {
+      temp_col_sel <- "mean_t2m"
+      prec_col_sel <- "mean_prectotcorr"
+      cloud_col_sel <- "mean_cloud_amt"
+      label_temp <- "Temp (annual) (°F)"
+      label_prec <- "Precip (annual) (mm/day)"
+      label_cloud <- "Cloud (annual) (%)"
+    } else {
+      sel_month_idx <- as.integer(sel_val)
+      sel_m <- tolower(month.abb[sel_month_idx])
+      temp_col_sel <- paste0("t2m_", sel_m)
+      prec_col_sel <- paste0("prectotcorr_", sel_m)
+      cloud_col_sel <- paste0("cloud_amt_", sel_m)
+      label_temp <- "Temp (selected month) (°F)"
+      label_prec <- "Precip (selected month) (mm/day)"
+      label_cloud <- "Cloud (selected month) (%)"
+    }
+
     data_to_show <- saved_data() %>%
       select(
         "Name" = all_of(col_inst_name),
@@ -805,21 +1103,24 @@ server <- function(input, output, session) {
         "Tuition (In)" = tuition_in,
         "Tuition (Out)" = tuition_out,
         "Avg. Net Price" = net_price_avg,
-        "Net Price (110k+)" = net_price_110k
+        "Net Price (110k+)" = net_price_110k,
+        # Climate columns intentionally removed per user preference
       ) %>%
       mutate(
         `Distance (mi)` = round(`Distance (mi)`, 1)
       )
     
+
     datatable(
       data_to_show, 
       selection = 'multiple', 
       options = list(pageLength = 25, scrollX = TRUE)
     ) %>%
       formatCurrency(
-        c("Tuition (In)", "Tuition (Out)", "Avg. Net Price", "Net Price (110k+)"), 
+        c("Tuition (In)", "Tuition (Out)", "Avg. Net Price", "Net Price (110k+)") ,
         digits = 0
       )
+      # climate columns removed — no additional rounding needed here
   })
   
   
@@ -873,10 +1174,9 @@ server <- function(input, output, session) {
              ),
        column(3, tags$img(src= paste0("https://web2.ncaa.org/ncaa_style/img/All_Logos/sm//",school_data$prev_team_id,".gif"), 
                      height = "100px")
-             )
-              ),
-       
-        hr(),
+               )
+             ),
+             hr(),
         
         # --- ROW 1: Current Snapshot (Existing) ---
         fluidRow(

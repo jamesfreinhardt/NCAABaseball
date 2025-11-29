@@ -5,7 +5,7 @@ account: jamesfreinhardt
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16032623
-bundleId: 11238851
+bundleId: 11248074
 url: https://jamesfreinhardt.shinyapps.io/NCAA_Baseball_Schools/
 version: 1
 asMultiple: FALSE
