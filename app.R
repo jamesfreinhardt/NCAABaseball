@@ -11,11 +11,21 @@ library(plotly)      # For plots
 library(bslib)       # For modern layout & accordion
 library(shinyWidgets)  # For pickerInput & sliderTextInput
 library(scales)      # For scales::percent in new plot
+library(DBI)         # For database operations
+library(RSQLite)     # For SQLite database
 
 # ===================================================================
 # --- GLOBAL SECTION (Runs only ONCE when app starts) ---
 # ===================================================================
 
+# --- Load Database Functions ---
+source("db_setup.R")
+source("db_functions.R")
+
+# --- Initialize Database (if not exists) ---
+if (!check_database()) {
+  init_database()
+}
 
 # --- 2. Load Data ---
 merged_data2 <- read.csv("input.csv") 
@@ -654,6 +664,169 @@ ui <- bslib::page_sidebar(
       fluidRow(
         column(12,
                uiOutput("roster_cards_ui")
+        )
+      )
+    ),
+    
+    bslib::nav_panel(
+      title = "Player Registration",
+      fluidRow(
+        column(12,
+               h2("Player Registration & Profile"),
+               p("Create your player profile to help college coaches discover you. Complete all sections to maximize your recruiting opportunities."),
+               hr(),
+               
+               # Personal Information Section
+               h3("Personal Information"),
+               fluidRow(
+                 column(6,
+                        textInput("reg_first_name", "First Name*", placeholder = "John"),
+                        textInput("reg_email", "Email Address*", placeholder = "player@example.com"),
+                        textInput("reg_zip_code", "Zip Code*", placeholder = "21703")
+                 ),
+                 column(6,
+                        textInput("reg_last_name", "Last Name*", placeholder = "Smith"),
+                        textInput("reg_phone", "Phone Number", placeholder = "(123) 456-7890"),
+                        textInput("reg_state", "State", placeholder = "MD")
+                 )
+               ),
+               hr(),
+               
+               # Player Profile Section
+               h3("Player Profile"),
+               fluidRow(
+                 column(6,
+                        textInput("reg_high_school", "High School*", placeholder = "Example High School"),
+                        numericInput("reg_height_inches", "Height (inches)*", value = NULL, min = 48, max = 96, step = 1),
+                        selectInput("reg_primary_position", "Primary Position*", 
+                                    choices = c("", "Pitcher", "Catcher", "First Base", "Second Base", 
+                                               "Third Base", "Shortstop", "Outfield", "Utility")),
+                        selectInput("reg_bats", "Bats*", choices = c("", "Right", "Left", "Switch"))
+                 ),
+                 column(6,
+                        numericInput("reg_graduation_year", "High School Graduation Year*", 
+                                    value = NULL, min = 2024, max = 2030, step = 1),
+                        numericInput("reg_weight_lbs", "Weight (lbs)*", value = NULL, min = 100, max = 350, step = 1),
+                        selectInput("reg_secondary_position", "Secondary Position", 
+                                    choices = c("", "Pitcher", "Catcher", "First Base", "Second Base", 
+                                               "Third Base", "Shortstop", "Outfield", "Utility")),
+                        selectInput("reg_throws", "Throws*", choices = c("", "Right", "Left"))
+                 )
+               ),
+               hr(),
+               
+               # Academic Information Section
+               h3("Academic Information"),
+               fluidRow(
+                 column(4,
+                        numericInput("reg_gpa", "GPA (4.0 scale)*", value = NULL, min = 0, max = 4.0, step = 0.01),
+                        numericInput("reg_sat_score", "SAT Score", value = NULL, min = 400, max = 1600, step = 10)
+                 ),
+                 column(4,
+                        numericInput("reg_weighted_gpa", "Weighted GPA", value = NULL, min = 0, max = 5.0, step = 0.01),
+                        numericInput("reg_act_score", "ACT Score", value = NULL, min = 1, max = 36, step = 1)
+                 ),
+                 column(4,
+                        numericInput("reg_class_rank", "Class Rank", value = NULL, min = 1, step = 1),
+                        numericInput("reg_class_size", "Class Size", value = NULL, min = 1, step = 1)
+                 )
+               ),
+               hr(),
+               
+               # Athletic Metrics Section
+               h3("Athletic Metrics"),
+               h4("Hitting Statistics"),
+               fluidRow(
+                 column(3,
+                        numericInput("reg_batting_avg", "Batting Average", value = NULL, min = 0, max = 1, step = 0.001)
+                 ),
+                 column(3,
+                        numericInput("reg_on_base_pct", "On-Base %", value = NULL, min = 0, max = 1, step = 0.001)
+                 ),
+                 column(3,
+                        numericInput("reg_slugging_pct", "Slugging %", value = NULL, min = 0, max = 4, step = 0.001)
+                 ),
+                 column(3,
+                        numericInput("reg_home_runs", "Home Runs", value = NULL, min = 0, step = 1)
+                 )
+               ),
+               fluidRow(
+                 column(4,
+                        numericInput("reg_rbi", "RBI", value = NULL, min = 0, step = 1)
+                 ),
+                 column(4,
+                        numericInput("reg_stolen_bases", "Stolen Bases", value = NULL, min = 0, step = 1)
+                 ),
+                 column(4,
+                        numericInput("reg_exit_velocity", "Exit Velocity (mph)", value = NULL, min = 0, max = 120, step = 0.1)
+                 )
+               ),
+               
+               h4("Pitching Statistics"),
+               fluidRow(
+                 column(3,
+                        numericInput("reg_era", "ERA", value = NULL, min = 0, max = 99, step = 0.01)
+                 ),
+                 column(3,
+                        numericInput("reg_strikeouts", "Strikeouts", value = NULL, min = 0, step = 1)
+                 ),
+                 column(3,
+                        numericInput("reg_walks", "Walks", value = NULL, min = 0, step = 1)
+                 ),
+                 column(3,
+                        numericInput("reg_innings_pitched", "Innings Pitched", value = NULL, min = 0, step = 0.1)
+                 )
+               ),
+               fluidRow(
+                 column(4,
+                        numericInput("reg_wins", "Wins", value = NULL, min = 0, step = 1)
+                 ),
+                 column(4,
+                        numericInput("reg_saves", "Saves", value = NULL, min = 0, step = 1)
+                 ),
+                 column(4,
+                        numericInput("reg_fastball_velocity", "Fastball Velocity (mph)", 
+                                    value = NULL, min = 0, max = 110, step = 0.1)
+                 )
+               ),
+               
+               h4("Speed & Athleticism"),
+               fluidRow(
+                 column(6,
+                        numericInput("reg_sixty_yard_dash", "60-Yard Dash (seconds)", 
+                                    value = NULL, min = 5, max = 10, step = 0.01)
+                 )
+               ),
+               hr(),
+               
+               # College Search Preferences Section
+               h3("College Search Preferences"),
+               fluidRow(
+                 column(6,
+                        checkboxGroupInput("reg_preferred_divisions", "Preferred Divisions",
+                                          choices = c("Division 1" = "1", "Division 2" = "2", "Division 3" = "3"),
+                                          selected = c("1", "2", "3")),
+                        numericInput("reg_max_distance", "Maximum Distance from Home (miles)", 
+                                    value = 500, min = 0, max = 3000, step = 50)
+                 ),
+                 column(6,
+                        numericInput("reg_max_tuition", "Maximum Tuition ($)", 
+                                    value = 50000, min = 0, max = 100000, step = 1000),
+                        textAreaInput("reg_preferred_locale", "Preferred School Settings (e.g., City, Suburb, Rural)", 
+                                     placeholder = "City (Large), Suburb (Mid)", rows = 2)
+                 )
+               ),
+               hr(),
+               
+               # Action Buttons
+               fluidRow(
+                 column(12,
+                        actionButton("save_registration", "Save Profile", class = "btn-primary btn-lg"),
+                        actionButton("load_registration", "Load Existing Profile", class = "btn-secondary"),
+                        tags$div(style = "margin-top: 15px;",
+                                textOutput("registration_message"))
+                 )
+               )
         )
       )
     )
@@ -1444,6 +1617,253 @@ server <- function(input, output, session) {
     
     # Trigger a browser resize event to wake up Leaflet
     shinyjs::runjs("setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 200);")
+  })
+  
+  # ===================================================================
+  # --- REGISTRATION SYSTEM SERVER LOGIC ---
+  # ===================================================================
+  
+  # ReactiveVal to store current user ID
+  current_user_id <- reactiveVal(NULL)
+  
+  # Save Registration - Handle form submission
+  observeEvent(input$save_registration, {
+    
+    # Validate required fields
+    if (is.null(input$reg_first_name) || input$reg_first_name == "" ||
+        is.null(input$reg_last_name) || input$reg_last_name == "" ||
+        is.null(input$reg_email) || input$reg_email == "") {
+      output$registration_message <- renderText({
+        "Error: Please fill in all required fields (First Name, Last Name, Email)"
+      })
+      return()
+    }
+    
+    # Email validation
+    email_pattern <- "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+    if (!grepl(email_pattern, input$reg_email)) {
+      output$registration_message <- renderText({
+        "Error: Please enter a valid email address"
+      })
+      return()
+    }
+    
+    # Check if user exists or create new user
+    existing_user <- get_user_by_email(input$reg_email)
+    
+    if (nrow(existing_user) > 0) {
+      # Update existing user
+      user_id <- existing_user$user_id[1]
+      update_result <- update_user(
+        user_id = user_id,
+        first_name = input$reg_first_name,
+        last_name = input$reg_last_name,
+        phone = input$reg_phone,
+        zip_code = input$reg_zip_code,
+        state = input$reg_state
+      )
+    } else {
+      # Create new user
+      user_result <- create_user(
+        email = input$reg_email,
+        first_name = input$reg_first_name,
+        last_name = input$reg_last_name,
+        phone = input$reg_phone,
+        zip_code = input$reg_zip_code,
+        state = input$reg_state
+      )
+      
+      if (!user_result$success) {
+        output$registration_message <- renderText({
+          paste("Error creating user:", user_result$message)
+        })
+        return()
+      }
+      
+      user_id <- user_result$user_id
+    }
+    
+    current_user_id(user_id)
+    
+    # Save player profile
+    if (!is.null(input$reg_high_school) && input$reg_high_school != "") {
+      profile_result <- save_player_profile(
+        user_id = user_id,
+        high_school = input$reg_high_school,
+        graduation_year = input$reg_graduation_year,
+        height_inches = input$reg_height_inches,
+        weight_lbs = input$reg_weight_lbs,
+        primary_position = input$reg_primary_position,
+        secondary_position = input$reg_secondary_position,
+        bats = input$reg_bats,
+        throws = input$reg_throws
+      )
+    }
+    
+    # Save academic info
+    if (!is.null(input$reg_gpa) && input$reg_gpa > 0) {
+      academic_result <- save_academic_info(
+        user_id = user_id,
+        gpa = input$reg_gpa,
+        weighted_gpa = input$reg_weighted_gpa,
+        sat_score = input$reg_sat_score,
+        act_score = input$reg_act_score,
+        class_rank = input$reg_class_rank,
+        class_size = input$reg_class_size
+      )
+    }
+    
+    # Save athletic metrics
+    # Check if any athletic metrics are provided
+    has_hitting_stats <- !is.null(input$reg_batting_avg) || !is.null(input$reg_home_runs)
+    has_pitching_stats <- !is.null(input$reg_era) || !is.null(input$reg_strikeouts)
+    
+    if (has_hitting_stats || has_pitching_stats) {
+      metrics_result <- save_athletic_metrics(
+        user_id = user_id,
+        batting_avg = input$reg_batting_avg,
+        on_base_pct = input$reg_on_base_pct,
+        slugging_pct = input$reg_slugging_pct,
+        home_runs = input$reg_home_runs,
+        rbi = input$reg_rbi,
+        stolen_bases = input$reg_stolen_bases,
+        era = input$reg_era,
+        strikeouts = input$reg_strikeouts,
+        walks = input$reg_walks,
+        innings_pitched = input$reg_innings_pitched,
+        wins = input$reg_wins,
+        saves = input$reg_saves,
+        exit_velocity = input$reg_exit_velocity,
+        sixty_yard_dash = input$reg_sixty_yard_dash,
+        fastball_velocity = input$reg_fastball_velocity
+      )
+    }
+    
+    # Save user preferences
+    if (!is.null(input$reg_preferred_divisions)) {
+      prefs_result <- save_user_preferences(
+        user_id = user_id,
+        preferred_divisions = paste(input$reg_preferred_divisions, collapse = ","),
+        max_distance_miles = input$reg_max_distance,
+        max_tuition = input$reg_max_tuition,
+        preferred_locale = input$reg_preferred_locale
+      )
+    }
+    
+    # Success message
+    output$registration_message <- renderText({
+      paste("✓ Profile saved successfully! User ID:", user_id)
+    })
+    
+    # Update home zip code filter if provided
+    if (!is.null(input$reg_zip_code) && nchar(input$reg_zip_code) == 5) {
+      updateTextInput(session, "home_zip", value = input$reg_zip_code)
+    }
+  })
+  
+  # Load Registration - Populate form with existing data
+  observeEvent(input$load_registration, {
+    
+    # Show modal dialog to get email
+    showModal(modalDialog(
+      title = "Load Existing Profile",
+      textInput("load_email", "Enter your email address:", placeholder = "player@example.com"),
+      footer = tagList(
+        modalButton("Cancel"),
+        actionButton("confirm_load", "Load Profile")
+      )
+    ))
+  })
+  
+  # Confirm load profile
+  observeEvent(input$confirm_load, {
+    req(input$load_email)
+    
+    # Get user by email
+    user <- get_user_by_email(input$load_email)
+    
+    if (nrow(user) == 0) {
+      showNotification("No profile found with that email address", type = "error")
+      removeModal()
+      return()
+    }
+    
+    user_id <- user$user_id[1]
+    current_user_id(user_id)
+    
+    # Get complete profile
+    profile_data <- get_complete_profile(user_id)
+    
+    # Update form fields - Personal Info
+    updateTextInput(session, "reg_first_name", value = user$first_name[1])
+    updateTextInput(session, "reg_last_name", value = user$last_name[1])
+    updateTextInput(session, "reg_email", value = user$email[1])
+    updateTextInput(session, "reg_phone", value = user$phone[1])
+    updateTextInput(session, "reg_zip_code", value = user$zip_code[1])
+    updateTextInput(session, "reg_state", value = user$state[1])
+    
+    # Update Player Profile
+    if (nrow(profile_data$profile) > 0) {
+      p <- profile_data$profile[1, ]
+      updateTextInput(session, "reg_high_school", value = p$high_school)
+      updateNumericInput(session, "reg_graduation_year", value = p$graduation_year)
+      updateNumericInput(session, "reg_height_inches", value = p$height_inches)
+      updateNumericInput(session, "reg_weight_lbs", value = p$weight_lbs)
+      updateSelectInput(session, "reg_primary_position", selected = p$primary_position)
+      updateSelectInput(session, "reg_secondary_position", selected = p$secondary_position)
+      updateSelectInput(session, "reg_bats", selected = p$bats)
+      updateSelectInput(session, "reg_throws", selected = p$throws)
+    }
+    
+    # Update Academic Info
+    if (nrow(profile_data$academic) > 0) {
+      a <- profile_data$academic[1, ]
+      updateNumericInput(session, "reg_gpa", value = a$gpa)
+      updateNumericInput(session, "reg_weighted_gpa", value = a$weighted_gpa)
+      updateNumericInput(session, "reg_sat_score", value = a$sat_score)
+      updateNumericInput(session, "reg_act_score", value = a$act_score)
+      updateNumericInput(session, "reg_class_rank", value = a$class_rank)
+      updateNumericInput(session, "reg_class_size", value = a$class_size)
+    }
+    
+    # Update Athletic Metrics
+    if (nrow(profile_data$metrics) > 0) {
+      m <- profile_data$metrics[1, ]
+      updateNumericInput(session, "reg_batting_avg", value = m$batting_avg)
+      updateNumericInput(session, "reg_on_base_pct", value = m$on_base_pct)
+      updateNumericInput(session, "reg_slugging_pct", value = m$slugging_pct)
+      updateNumericInput(session, "reg_home_runs", value = m$home_runs)
+      updateNumericInput(session, "reg_rbi", value = m$rbi)
+      updateNumericInput(session, "reg_stolen_bases", value = m$stolen_bases)
+      updateNumericInput(session, "reg_era", value = m$era)
+      updateNumericInput(session, "reg_strikeouts", value = m$strikeouts)
+      updateNumericInput(session, "reg_walks", value = m$walks)
+      updateNumericInput(session, "reg_innings_pitched", value = m$innings_pitched)
+      updateNumericInput(session, "reg_wins", value = m$wins)
+      updateNumericInput(session, "reg_saves", value = m$saves)
+      updateNumericInput(session, "reg_exit_velocity", value = m$exit_velocity)
+      updateNumericInput(session, "reg_sixty_yard_dash", value = m$sixty_yard_dash)
+      updateNumericInput(session, "reg_fastball_velocity", value = m$fastball_velocity)
+    }
+    
+    # Update Preferences
+    if (nrow(profile_data$preferences) > 0) {
+      pr <- profile_data$preferences[1, ]
+      if (!is.null(pr$preferred_divisions) && !is.na(pr$preferred_divisions)) {
+        divisions <- strsplit(pr$preferred_divisions, ",")[[1]]
+        updateCheckboxGroupInput(session, "reg_preferred_divisions", selected = divisions)
+      }
+      updateNumericInput(session, "reg_max_distance", value = pr$max_distance_miles)
+      updateNumericInput(session, "reg_max_tuition", value = pr$max_tuition)
+      updateTextAreaInput(session, "reg_preferred_locale", value = pr$preferred_locale)
+    }
+    
+    removeModal()
+    showNotification("Profile loaded successfully!", type = "message")
+    
+    output$registration_message <- renderText({
+      paste("Profile loaded for:", user$first_name[1], user$last_name[1])
+    })
   })
   
 } # <-- This bracket closes the server function

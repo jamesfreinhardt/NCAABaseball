@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+# Database files
+*.db
+*.sqlite
+*.sqlite3
