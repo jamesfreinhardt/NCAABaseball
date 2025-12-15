@@ -235,6 +235,15 @@ inches_to_ft_in <- function(total_inches) {
   return(paste0(feet, "' ", inches, "\""))
 }
 
+# --- Helper function for win percentage calculation ---
+calc_win_pct <- function(wins, losses, ties = 0) {
+  total <- wins + losses + ties
+  if (is.na(total) || total == 0) {
+    return(0)
+  }
+  return(round((wins / total) * 100, 2))
+}
+
 all_map_data <- merged_data2 %>%
   mutate(
     #Type = .data[[col_usnews]],
@@ -1173,10 +1182,9 @@ server <- function(input, output, session) {
        column(6, h5(strong("Head Coach:"), 
               tags$a(href = coach_info$Coach_Stats_URL, coach_info$Head_Coach, target = "_blank")),
               h5(paste0("Career Record: ", coach_info$Total_Wins, "-", coach_info$Total_Losses, 
-                        " (", round(coach_info$Total_Wins/(coach_info$Total_Wins + coach_info$Total_Losses+coach_info$Total_Ties ),2)*100, "%)")),
+                        " (", calc_win_pct(coach_info$Total_Wins, coach_info$Total_Losses, coach_info$Total_Ties), "%)")),
               h5(paste0("At ", school_data$inst_name, ": ", coach_info$Wins, "-", coach_info$Losses,
-                        " (", ifelse(coach_info$Wins + coach_info$Losses > 0, 
-                                     round(coach_info$Wins/(coach_info$Wins + coach_info$Losses + coach_info$Ties), 2)*100, 0), "%)")),
+                        " (", calc_win_pct(coach_info$Wins, coach_info$Losses, coach_info$Ties), "%)")),
               p(strong("Seasons at School:"), coach_info$Seasons_At_Team),
              ),
        column(3, tags$img(src= paste0("https://web2.ncaa.org/ncaa_style/img/All_Logos/sm//",school_data$prev_team_id,".gif"), 
