@@ -1148,6 +1148,10 @@ server <- function(input, output, session) {
       # Define new IDs
       recruiting_plot_id <- paste0("recruiting_plot_", school_data$unitid)
       retention_plot_id <- paste0("retention_plot_", school_data$unitid)
+      trajectory_plot_id <- paste0("trajectory_plot_", school_data$unitid)
+      instate_plot_id <- paste0("instate_plot_", school_data$unitid)
+      playtime_plot_id <- paste0("playtime_plot_", school_data$unitid)
+      position_plot_id <- paste0("position_plot_", school_data$unitid)
       # Find matching coach info for this school
        coach_info <- team_history_updated %>%
         filter(prev_team_id == school_data$prev_team_id, Year == "2025-26") %>%
@@ -1168,9 +1172,12 @@ server <- function(input, output, session) {
         # Add coach details to the card
        column(6, h5(strong("Head Coach:"), 
               tags$a(href = coach_info$Coach_Stats_URL, coach_info$Head_Coach, target = "_blank")),
-              h5(paste0("Coaches Record: ", coach_info$Total_Wins, "-", coach_info$Total_Losses, 
+              h5(paste0("Career Record: ", coach_info$Total_Wins, "-", coach_info$Total_Losses, 
                         " (", round(coach_info$Total_Wins/(coach_info$Total_Wins + coach_info$Total_Losses+coach_info$Total_Ties ),2)*100, "%)")),
-              p(strong(paste0("Seasons at ",school_data$inst_name,":")), coach_info$Seasons_At_Team),
+              h5(paste0("At ", school_data$inst_name, ": ", coach_info$Wins, "-", coach_info$Losses,
+                        " (", ifelse(coach_info$Wins + coach_info$Losses > 0, 
+                                     round(coach_info$Wins/(coach_info$Wins + coach_info$Losses + coach_info$Ties), 2)*100, 0), "%)")),
+              p(strong("Seasons at School:"), coach_info$Seasons_At_Team),
              ),
        column(3, tags$img(src= paste0("https://web2.ncaa.org/ncaa_style/img/All_Logos/sm//",school_data$prev_team_id,".gif"), 
                      height = "100px")
@@ -1204,6 +1211,32 @@ server <- function(input, output, session) {
                  helpText("Avg % of Freshmen who return the following year"),
                  plotlyOutput(retention_plot_id, height = "250px")
           )
+        ),
+        
+        hr(), # Separator line
+        
+        # --- ROW 3: Additional Metrics for Recruits ---
+        fluidRow(
+          column(3,
+                 h5("Team Trajectory"),
+                 helpText("Win % trend over last 4 years"),
+                 plotlyOutput(trajectory_plot_id, height = "200px")
+          ),
+          column(3,
+                 h5("In-State Recruiting"),
+                 helpText("% of roster from home state"),
+                 plotlyOutput(instate_plot_id, height = "200px")
+          ),
+          column(3,
+                 h5("Freshman Playing Time"),
+                 helpText("Avg games played by freshmen"),
+                 plotlyOutput(playtime_plot_id, height = "200px")
+          ),
+          column(3,
+                 h5("Roster by Position"),
+                 helpText("Current roster depth"),
+                 plotlyOutput(position_plot_id, height = "200px")
+          )
         )
       )
     }) 
@@ -1232,6 +1265,10 @@ server <- function(input, output, session) {
           history_plot_id <- paste0("history_plot_", school_data$unitid)
           recruiting_plot_id <- paste0("recruiting_plot_", school_data$unitid)
           retention_plot_id <- paste0("retention_plot_", school_data$unitid)
+          trajectory_plot_id <- paste0("trajectory_plot_", school_data$unitid)
+          instate_plot_id <- paste0("instate_plot_", school_data$unitid)
+          playtime_plot_id <- paste0("playtime_plot_", school_data$unitid)
+          position_plot_id <- paste0("position_plot_", school_data$unitid)
                                       
           
           # --- Render Class Plot ---
@@ -1429,6 +1466,255 @@ server <- function(input, output, session) {
             ) %>% 
               config(displayModeBar = FALSE) %>%
               layout(margin = list(l=20,r=20,t=40,b=20))
+          })
+          
+          # =================================================
+          # --- NEW: Team Trajectory Plot ---
+          # =================================================
+          output[[trajectory_plot_id]] <- renderPlotly({
+            
+            current_team_name <- school_data$team_name
+            
+            school_history <- historical_data %>%
+              filter(team_name == current_team_name) %>%
+              arrange(year)
+            
+            if (nrow(school_history) < 2) {
+              return(
+                plot_ly() %>%
+                  layout(
+                    title = "Insufficient data",
+                    xaxis = list(visible = FALSE),
+                    yaxis = list(visible = FALSE),
+                    annotations = list(
+                      text = "Need 2+ years",
+                      showarrow = FALSE
+                    )
+                  )
+              )
+            }
+            
+            # Calculate trend (simple linear regression)
+            trend_data <- school_history %>%
+              mutate(year_numeric = as.numeric(year))
+            
+            if (nrow(trend_data) >= 2) {
+              lm_model <- lm(win_pct ~ year_numeric, data = trend_data)
+              slope <- coef(lm_model)[2]
+              
+              # Determine arrow and color based on trend
+              if (slope > 0.02) {
+                trend_symbol <- "▲"
+                trend_color <- "green"
+                trend_text <- "Improving"
+              } else if (slope < -0.02) {
+                trend_symbol <- "▼"
+                trend_color <- "red"
+                trend_text <- "Declining"
+              } else {
+                trend_symbol <- "■"
+                trend_color <- "gray"
+                trend_text <- "Stable"
+              }
+            } else {
+              trend_symbol <- "■"
+              trend_color <- "gray"
+              trend_text <- "Stable"
+            }
+            
+            # Create visualization showing trend
+            plot_ly() %>%
+              add_trace(
+                type = "indicator",
+                mode = "number+delta",
+                value = round(tail(school_history$win_pct, 1) * 100, 1),
+                title = list(text = trend_text),
+                delta = list(
+                  reference = round(head(school_history$win_pct, 1) * 100, 1),
+                  increasing = list(color = "green"),
+                  decreasing = list(color = "red")
+                ),
+                number = list(suffix = "%")
+              ) %>%
+              config(displayModeBar = FALSE) %>%
+              layout(margin = list(l=20, r=20, t=40, b=20))
+          })
+          
+          # =================================================
+          # --- NEW: In-State Recruiting Plot ---
+          # =================================================
+          output[[instate_plot_id]] <- renderPlotly({
+            
+            # Get current roster for this team
+            max_yr <- max(roster_history_raw$year, na.rm = TRUE)
+            
+            current_roster <- roster_history_raw %>%
+              filter(prev_team_id == school_data$prev_team_id,
+                     year == max_yr)
+            
+            if (nrow(current_roster) == 0) {
+              return(
+                plot_ly() %>%
+                  layout(
+                    title = "No data",
+                    xaxis = list(visible = FALSE),
+                    yaxis = list(visible = FALSE)
+                  )
+              )
+            }
+            
+            # Get school's home state
+            home_state <- school_data$state_abbr
+            
+            # Calculate in-state vs out-of-state
+            total_players <- nrow(current_roster)
+            instate_players <- sum(current_roster$State == home_state, na.rm = TRUE)
+            instate_pct <- round((instate_players / total_players) * 100, 1)
+            
+            # Create gauge
+            plot_ly(
+              domain = list(x = c(0, 1), y = c(0, 1)),
+              value = instate_pct,
+              title = list(text = paste0(home_state, " Players")),
+              type = "indicator",
+              mode = "gauge+number",
+              number = list(suffix = "%"),
+              gauge = list(
+                axis = list(range = list(NULL, 100)),
+                bar = list(color = "steelblue"),
+                steps = list(
+                  list(range = c(0, 25), color = "#f0f0f0"),
+                  list(range = c(25, 50), color = "#d0d0d0"),
+                  list(range = c(50, 75), color = "#b0b0b0"),
+                  list(range = c(75, 100), color = "#909090")
+                )
+              )
+            ) %>%
+              config(displayModeBar = FALSE) %>%
+              layout(margin = list(l=20, r=20, t=40, b=20))
+          })
+          
+          # =================================================
+          # --- NEW: Freshman Playing Time Plot ---
+          # =================================================
+          output[[playtime_plot_id]] <- renderPlotly({
+            
+            # Get recent years of roster data
+            max_yr <- max(roster_history_raw$year, na.rm = TRUE)
+            target_years <- (max_yr - 3):max_yr
+            
+            team_roster <- roster_history_raw %>%
+              filter(prev_team_id == school_data$prev_team_id,
+                     year %in% target_years)
+            
+            if (nrow(team_roster) == 0) {
+              return(
+                plot_ly() %>%
+                  layout(
+                    title = "No data",
+                    xaxis = list(visible = FALSE),
+                    yaxis = list(visible = FALSE)
+                  )
+              )
+            }
+            
+            # Calculate average games played by class
+            games_by_class <- team_roster %>%
+              filter(!is.na(games_played), games_played != "") %>%
+              mutate(
+                games_played = as.numeric(games_played),
+                class_clean = trimws(class)
+              ) %>%
+              group_by(class_clean) %>%
+              summarize(avg_games = mean(games_played, na.rm = TRUE), .groups = "drop") %>%
+              filter(class_clean %in% c("Fr.", "So.", "Jr.", "Sr.")) %>%
+              mutate(class_clean = factor(class_clean, levels = c("Fr.", "So.", "Jr.", "Sr.")))
+            
+            if (nrow(games_by_class) == 0) {
+              return(
+                plot_ly() %>%
+                  layout(
+                    title = "No data",
+                    xaxis = list(visible = FALSE),
+                    yaxis = list(visible = FALSE)
+                  )
+              )
+            }
+            
+            # Create bar chart
+            plot_ly(games_by_class, x = ~class_clean, y = ~avg_games, type = 'bar',
+                    marker = list(color = c("lightblue", "skyblue", "cornflowerblue", "darkblue"))) %>%
+              config(displayModeBar = FALSE) %>%
+              layout(
+                xaxis = list(title = ""),
+                yaxis = list(title = "Avg Games"),
+                margin = list(l=40, r=20, t=20, b=30)
+              )
+          })
+          
+          # =================================================
+          # --- NEW: Position Depth Plot ---
+          # =================================================
+          output[[position_plot_id]] <- renderPlotly({
+            
+            # Get current roster
+            max_yr <- max(roster_history_raw$year, na.rm = TRUE)
+            
+            current_roster <- roster_history_raw %>%
+              filter(prev_team_id == school_data$prev_team_id,
+                     year == max_yr)
+            
+            if (nrow(current_roster) == 0) {
+              return(
+                plot_ly() %>%
+                  layout(
+                    title = "No data",
+                    xaxis = list(visible = FALSE),
+                    yaxis = list(visible = FALSE)
+                  )
+              )
+            }
+            
+            # Group positions into categories
+            position_counts <- current_roster %>%
+              filter(!is.na(position), position != "") %>%
+              mutate(
+                pos_group = case_when(
+                  grepl("^[pP]", position) ~ "P",
+                  grepl("^[cC]", position) ~ "C",
+                  grepl("1[bB]|^1B", position) ~ "1B",
+                  grepl("2[bB]|^2B", position) ~ "2B",
+                  grepl("3[bB]|^3B", position) ~ "3B",
+                  grepl("[sS][sS]|^SS", position) ~ "SS",
+                  grepl("[oO][fF]|^OF", position) ~ "OF",
+                  grepl("DH|dh", position) ~ "DH",
+                  TRUE ~ "Other"
+                )
+              ) %>%
+              count(pos_group) %>%
+              filter(pos_group != "Other") %>%
+              arrange(desc(n))
+            
+            if (nrow(position_counts) == 0) {
+              return(
+                plot_ly() %>%
+                  layout(
+                    title = "No data",
+                    xaxis = list(visible = FALSE),
+                    yaxis = list(visible = FALSE)
+                  )
+              )
+            }
+            
+            # Create bar chart
+            plot_ly(position_counts, x = ~pos_group, y = ~n, type = 'bar',
+                    marker = list(color = "darkgreen")) %>%
+              config(displayModeBar = FALSE) %>%
+              layout(
+                xaxis = list(title = "", categoryorder = "total descending"),
+                yaxis = list(title = "Players"),
+                margin = list(l=40, r=20, t=20, b=30)
+              )
           })
           
         }) # End local()
