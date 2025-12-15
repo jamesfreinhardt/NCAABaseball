@@ -39,8 +39,8 @@ This document describes the additional metrics that have been added to help recr
 
 ---
 
-### 3. Freshman Playing Time
-**Purpose**: Shows average games played by each class year, highlighting opportunities for freshmen.
+### 3. Playing Time by Class
+**Purpose**: Shows average games played by each class year, highlighting opportunities for freshmen and progression across all years.
 
 **Calculation**:
 - Analyzes roster data from last 4 years
@@ -51,7 +51,8 @@ This document describes the additional metrics that have been added to help recr
 - Critical for recruits who want to know if freshmen get playing time
 - Low freshman numbers may indicate limited opportunities for newcomers
 - High freshman numbers suggest the program gives younger players chances
-- Helps set realistic expectations for first year
+- Shows typical playing time progression from freshman to senior year
+- Helps set realistic expectations for first year and beyond
 
 **Visualization**: Bar chart comparing average games played across all four class years
 

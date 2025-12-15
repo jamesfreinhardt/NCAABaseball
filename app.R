@@ -1496,7 +1496,10 @@ server <- function(input, output, session) {
             
             # Calculate trend (simple linear regression)
             trend_data <- school_history %>%
-              mutate(year_numeric = as.numeric(year))
+              mutate(year_numeric = as.numeric(year)) %>%
+              # Filter out any rows with missing or invalid data
+              filter(!is.na(win_pct), !is.infinite(win_pct), 
+                     !is.na(year_numeric), !is.infinite(year_numeric))
             
             # Initialize default values
             trend_symbol <- "■"
@@ -1516,7 +1519,7 @@ server <- function(input, output, session) {
               })
               
               # Process the result
-              if (trend_result$success && !is.na(trend_result$slope)) {
+              if (trend_result$success && !is.na(trend_result$slope) && !is.infinite(trend_result$slope)) {
                 slope <- trend_result$slope
                 
                 # Determine arrow and color based on trend
@@ -1658,7 +1661,10 @@ server <- function(input, output, session) {
             # Create color mapping based on actual classes present
             color_map <- c("Fr." = "lightblue", "So." = "skyblue", 
                           "Jr." = "cornflowerblue", "Sr." = "darkblue")
-            colors <- color_map[as.character(games_by_class$class_clean)]
+            # Map colors and use steelblue as fallback for unexpected class levels
+            colors <- ifelse(as.character(games_by_class$class_clean) %in% names(color_map),
+                           color_map[as.character(games_by_class$class_clean)],
+                           "steelblue")
             
             # Create bar chart
             plot_ly(games_by_class, x = ~class_clean, y = ~avg_games, type = 'bar',
