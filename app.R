@@ -1228,8 +1228,8 @@ server <- function(input, output, session) {
                  plotlyOutput(instate_plot_id, height = "200px")
           ),
           column(3,
-                 h5("Freshman Playing Time"),
-                 helpText("Avg games played by freshmen"),
+                 h5("Playing Time by Class"),
+                 helpText("Avg games played by class year"),
                  plotlyOutput(playtime_plot_id, height = "200px")
           ),
           column(3,
@@ -1498,42 +1498,42 @@ server <- function(input, output, session) {
             trend_data <- school_history %>%
               mutate(year_numeric = as.numeric(year))
             
+            # Initialize default values
+            trend_symbol <- "■"
+            trend_color <- "gray"
+            trend_text <- "Stable"
+            
             if (nrow(trend_data) >= 2) {
               # Safely calculate trend with error handling
-              tryCatch({
+              trend_result <- tryCatch({
                 lm_model <- lm(win_pct ~ year_numeric, data = trend_data)
                 slope <- coef(lm_model)[2]
                 
-                # Check if slope is valid
-                if (is.na(slope)) {
+                # Return list with slope value
+                list(success = TRUE, slope = slope)
+              }, error = function(e) {
+                list(success = FALSE, slope = NA)
+              })
+              
+              # Process the result
+              if (trend_result$success && !is.na(trend_result$slope)) {
+                slope <- trend_result$slope
+                
+                # Determine arrow and color based on trend
+                if (slope > 0.02) {
+                  trend_symbol <- "▲"
+                  trend_color <- "green"
+                  trend_text <- "Improving"
+                } else if (slope < -0.02) {
+                  trend_symbol <- "▼"
+                  trend_color <- "red"
+                  trend_text <- "Declining"
+                } else {
                   trend_symbol <- "■"
                   trend_color <- "gray"
                   trend_text <- "Stable"
-                } else {
-                  # Determine arrow and color based on trend
-                  if (slope > 0.02) {
-                    trend_symbol <- "▲"
-                    trend_color <- "green"
-                    trend_text <- "Improving"
-                  } else if (slope < -0.02) {
-                    trend_symbol <- "▼"
-                    trend_color <- "red"
-                    trend_text <- "Declining"
-                  } else {
-                    trend_symbol <- "■"
-                    trend_color <- "gray"
-                    trend_text <- "Stable"
-                  }
                 }
-              }, error = function(e) {
-                trend_symbol <<- "■"
-                trend_color <<- "gray"
-                trend_text <<- "Stable"
-              })
-            } else {
-              trend_symbol <- "■"
-              trend_color <- "gray"
-              trend_text <- "Stable"
+              }
             }
             
             # Create visualization showing trend
