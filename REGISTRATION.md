@@ -188,10 +188,80 @@ NCAABaseball/
 ├── app.R                    # Main Shiny application (modified)
 ├── db_setup.R              # Database initialization script (new)
 ├── db_functions.R          # Database CRUD operations (new)
+├── test_registration.R     # Automated test suite (new)
+├── example_usage.R         # Example code demonstrating API usage (new)
+├── import_export.R         # CSV import/export utilities (new)
 ├── REGISTRATION.md         # This documentation file (new)
 ├── .gitignore              # Updated to exclude database files
 └── ncaa_baseball.db        # SQLite database (created at runtime)
 ```
+
+## Testing
+
+### Running Automated Tests
+
+To verify the registration system is working correctly, run:
+
+```r
+source("test_registration.R")
+```
+
+This will:
+- Create a test database
+- Test all CRUD operations
+- Verify data integrity
+- Test cascade deletes
+- Clean up test data
+
+### Running Examples
+
+To see the registration system in action:
+
+```r
+source("example_usage.R")
+```
+
+This will:
+- Create sample player profiles
+- Demonstrate retrieval operations
+- Show update operations
+- Demonstrate search queries
+
+## Data Import/Export
+
+### Creating a CSV Template
+
+To create a template for bulk importing players:
+
+```r
+source("import_export.R")
+create_import_template("players_template.csv")
+```
+
+### Importing Players from CSV
+
+To import player data from a CSV file:
+
+```r
+source("import_export.R")
+import_players_from_csv("my_players.csv")
+```
+
+The CSV file should include columns for:
+- **Required**: email, first_name, last_name
+- **Optional**: All other fields (phone, zip_code, high_school, gpa, batting_avg, etc.)
+
+### Exporting Players to CSV
+
+To export all player data to a CSV file:
+
+```r
+source("import_export.R")
+export_players_to_csv("player_backup.csv")
+```
+
+This creates a complete backup of all player data that can be imported later.
+
 
 ## Troubleshooting
 
