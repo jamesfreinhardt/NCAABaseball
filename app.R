@@ -1499,23 +1499,37 @@ server <- function(input, output, session) {
               mutate(year_numeric = as.numeric(year))
             
             if (nrow(trend_data) >= 2) {
-              lm_model <- lm(win_pct ~ year_numeric, data = trend_data)
-              slope <- coef(lm_model)[2]
-              
-              # Determine arrow and color based on trend
-              if (slope > 0.02) {
-                trend_symbol <- "▲"
-                trend_color <- "green"
-                trend_text <- "Improving"
-              } else if (slope < -0.02) {
-                trend_symbol <- "▼"
-                trend_color <- "red"
-                trend_text <- "Declining"
-              } else {
-                trend_symbol <- "■"
-                trend_color <- "gray"
-                trend_text <- "Stable"
-              }
+              # Safely calculate trend with error handling
+              tryCatch({
+                lm_model <- lm(win_pct ~ year_numeric, data = trend_data)
+                slope <- coef(lm_model)[2]
+                
+                # Check if slope is valid
+                if (is.na(slope)) {
+                  trend_symbol <- "■"
+                  trend_color <- "gray"
+                  trend_text <- "Stable"
+                } else {
+                  # Determine arrow and color based on trend
+                  if (slope > 0.02) {
+                    trend_symbol <- "▲"
+                    trend_color <- "green"
+                    trend_text <- "Improving"
+                  } else if (slope < -0.02) {
+                    trend_symbol <- "▼"
+                    trend_color <- "red"
+                    trend_text <- "Declining"
+                  } else {
+                    trend_symbol <- "■"
+                    trend_color <- "gray"
+                    trend_text <- "Stable"
+                  }
+                }
+              }, error = function(e) {
+                trend_symbol <<- "■"
+                trend_color <<- "gray"
+                trend_text <<- "Stable"
+              })
             } else {
               trend_symbol <- "■"
               trend_color <- "gray"
@@ -1641,9 +1655,14 @@ server <- function(input, output, session) {
               )
             }
             
+            # Create color mapping based on actual classes present
+            color_map <- c("Fr." = "lightblue", "So." = "skyblue", 
+                          "Jr." = "cornflowerblue", "Sr." = "darkblue")
+            colors <- color_map[as.character(games_by_class$class_clean)]
+            
             # Create bar chart
             plot_ly(games_by_class, x = ~class_clean, y = ~avg_games, type = 'bar',
-                    marker = list(color = c("lightblue", "skyblue", "cornflowerblue", "darkblue"))) %>%
+                    marker = list(color = colors)) %>%
               config(displayModeBar = FALSE) %>%
               layout(
                 xaxis = list(title = ""),
@@ -1679,15 +1698,16 @@ server <- function(input, output, session) {
             position_counts <- current_roster %>%
               filter(!is.na(position), position != "") %>%
               mutate(
+                position_upper = toupper(trimws(position)),
                 pos_group = case_when(
-                  grepl("^[pP]", position) ~ "P",
-                  grepl("^[cC]", position) ~ "C",
-                  grepl("1[bB]|^1B", position) ~ "1B",
-                  grepl("2[bB]|^2B", position) ~ "2B",
-                  grepl("3[bB]|^3B", position) ~ "3B",
-                  grepl("[sS][sS]|^SS", position) ~ "SS",
-                  grepl("[oO][fF]|^OF", position) ~ "OF",
-                  grepl("DH|dh", position) ~ "DH",
+                  grepl("^P$|^P/|PITCHER", position_upper) ~ "P",
+                  grepl("^C$|^C/|CATCHER", position_upper) ~ "C",
+                  grepl("1B|FIRST", position_upper) ~ "1B",
+                  grepl("2B|SECOND", position_upper) ~ "2B",
+                  grepl("3B|THIRD", position_upper) ~ "3B",
+                  grepl("SS|SHORT", position_upper) ~ "SS",
+                  grepl("OF|OUTFIELD", position_upper) ~ "OF",
+                  grepl("DH|DESIGNATED", position_upper) ~ "DH",
                   TRUE ~ "Other"
                 )
               ) %>%
